@@ -117,9 +117,13 @@ Samtools() {
 }
 
 
-mkdir featureCounts
+featureCounts () {
 
-featureCounts -p -t exon -g gene_id -a TAIR10.gtf -o featureCounts/counts.txt Alignement/*bam
+	mkdir featureCounts
+
+	featureCounts -p -t exon -g gene_id -a TAIR10.gtf -o featureCounts/counts.txt Alignement/*bam
+
+}
 
 #################
 
@@ -141,11 +145,15 @@ for SAMPLE in $SAMPLES
 		for REPLICATE in `seq 1 $(ls "$EXP"/"$SAMPLE"/*R1* | wc -l)`
 		do
 
-			Alignement 
+			Samtools
 
 		done
 
 	done
+
+wait
+
+featureCounts
 
 
 
