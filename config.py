@@ -9,14 +9,14 @@
 
 
 ### Trimming
-TRIMMING = 		True
-ADAPTERS = 		"/Users/vindarbo/happy_bin/bbmap/resources/adapters.fa"
+TRIMMING =		True
+ADAPTERS =		"/Users/vindarbo/happy_bin/bbmap/resources/adapters.fa"
 minlen   =		25 
 ktrim    =		"r" 
 k        =		22 
-qtrim    =	    "rl" 
-trimq    =	    10 
-hdist    =	    1
+qtrim    =		"rl" 
+trimq    =		10 
+hdist    =		1
 
 
 ### Mapping
