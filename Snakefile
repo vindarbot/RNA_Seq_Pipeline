@@ -16,7 +16,7 @@ CONDITIONS = list(set(x.split("_")[0] for x in SAMPLES))
 
 
 
-DIRS = ['Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts']
+DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts']
 
 for path in DIRS:
 	if not os.path.exists(path):
@@ -31,7 +31,36 @@ rule all:
 		expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
 		expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES),
 		"featureCounts/counts.txt"
+		"Reference/reference.fasta"
 
+
+
+FASTA_NAME = os.path.basename(GET_GENOME)
+GTF_NAME = os.path.basename(GET_GTF)
+
+
+rule get_reference_files:
+	output:
+		"Reference/reference.fasta"
+
+	params:
+		get_genome = GET_GENOME,
+		get_gtf = GET_GTF,
+		get_description = GET_DESCRIPTION,
+		fasta_name = FASTA_NAME,
+		gtf_name = GTF_NAME
+
+	message: ''' --- downloading fasta and gtf files --- '''
+
+	shell: ''' 
+		wget {params.get_genome}; mv {params.fasta_name} Reference/reference.fasta
+		wget {params.get_gtf}; mv {params.gtf_name} reference.gff
+		awk '{{ sub(/'ChrM'/,"mitochondria"); sub(/'ChrC'/,"chloroplast"); sub(/'Chr'/,"");print}}' reference.gff > reference_clean.gff
+		rm reference.gff
+		gffread reference_clean.gff -T -o reference.gtf
+		rm reference_clean.gff
+		wget {params.get_description}
+		'''
 
 
 rule trimming:
@@ -50,6 +79,9 @@ rule trimming:
 	    ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo '
 
 
+GENOME = "Reference/reference.fasta"
+GTF = "reference.gtf"
+
 
 rule indexation_genome:
 	input:
@@ -57,9 +89,14 @@ rule indexation_genome:
 		gtf = GTF,
 		starref = 'Reference/star/'
 
+	output:
+		"Reference/star/chrName.txt"
+
+	threads: 16
+
 	message: ''' --- Indexation du génome de référence --- '''
 
-	shell: ' STAR --runThreadN 16 --runMode genomeGenerate --genomeDir {input.starref} --genomeFastaFiles {input.genome}'
+	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {input.starref} --genomeFastaFiles {input.genome}'
 
 
 rule mapping_PE:
@@ -75,7 +112,9 @@ rule mapping_PE:
 
 	message: ''' --- Alignement des lectures --- '''
 
-	shell: ' STAR --runThreadN 2 --sjdbGTFfile {input.gtf} --sjdbOverhang '+str(READ_LENGHT-1)+' --genomeDir {input.starref} \
+	threads: 16
+
+	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --sjdbOverhang '+str(READ_LENGHT-1)+' --genomeDir {input.starref} \
 	--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r1} {input.r2} --outSAMtype BAM SortedByCoordinate; \
 	mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
 
@@ -87,7 +126,9 @@ rule sort_bam:
 	output:
 		"Mapping/{sample}.sorted.bam"
 
-	shell: ''' samtools sort {input} -o {output} '''
+	threads: 16
+
+	shell: ''' samtools sort {input} -o {output} -@ {threads} '''
 
 
 rule index_bam:
@@ -111,15 +152,9 @@ rule featureCounts:
 	params:
 		gtf = GTF
 
-	shell: ''' featureCounts -p -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
+	threads: 16
 
-
-
-
-
-
-
-
+	shell: ''' featureCounts -T {threads} -p -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
 
 
 
