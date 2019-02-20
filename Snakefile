@@ -30,9 +30,10 @@ rule all:
 		expand("Mapping/{sample}.bam", sample=SAMPLES),
 		expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
 		expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES),
-		"featureCounts/counts.txt"
-		"Reference/reference.fasta"
-
+		"featureCounts/counts.txt",
+		"Reference/reference.fasta",
+		"reference.gtf"
+		
 
 
 FASTA_NAME = os.path.basename(GET_GENOME)
@@ -41,8 +42,8 @@ GTF_NAME = os.path.basename(GET_GTF)
 
 rule get_reference_files:
 	output:
-		"Reference/reference.fasta"
-
+		fasta = "Reference/reference.fasta",
+		gtf = "reference.gtf"
 	params:
 		get_genome = GET_GENOME,
 		get_gtf = GET_GTF,
@@ -53,11 +54,11 @@ rule get_reference_files:
 	message: ''' --- downloading fasta and gtf files --- '''
 
 	shell: ''' 
-		wget {params.get_genome}; mv {params.fasta_name} Reference/reference.fasta
+		wget {params.get_genome}; mv {params.fasta_name} {output.fasta}
 		wget {params.get_gtf}; mv {params.gtf_name} reference.gff
 		awk '{{ sub(/'ChrM'/,"mitochondria"); sub(/'ChrC'/,"chloroplast"); sub(/'Chr'/,"");print}}' reference.gff > reference_clean.gff
 		rm reference.gff
-		gffread reference_clean.gff -T -o reference.gtf
+		gffread reference_clean.gff -T -o {output.gtf}
 		rm reference_clean.gff
 		wget {params.get_description}
 		'''
