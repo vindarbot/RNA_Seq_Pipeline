@@ -113,7 +113,7 @@ rule mapping_PE:
 
 	message: ''' --- Alignement des lectures --- '''
 
-	threads: 16
+	threads: 4
 
 	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --sjdbOverhang '+str(READ_LENGHT-1)+' --genomeDir {input.starref} \
 	--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r1} {input.r2} --outSAMtype BAM SortedByCoordinate; \
