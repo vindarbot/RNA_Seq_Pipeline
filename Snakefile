@@ -75,7 +75,7 @@ rule mapping_PE:
 
 	message: ''' --- Alignement des lectures --- '''
 
-	shell: ' STAR --runThreadN 2 --sjdbGTFfile {gtf} --sjdbOverhang '+str(READ_LENGHT-1)+'--genomeDir {input.starref} \
+	shell: ' STAR --runThreadN 2 --sjdbGTFfile {input.gtf} --sjdbOverhang '+str(READ_LENGHT-1)+'--genomeDir {input.starref} \
 	--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r1} {input.r2} --outSAMtype BAM SortedByCoordinate; \
 	mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
 
