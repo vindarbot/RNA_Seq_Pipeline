@@ -37,8 +37,4 @@ hdist    =		1
 
 ### Mapping
 
-# path to reference genome (default = TAIR10.fasta)
-GENOME	=		'Reference/TAIR10.fasta'
 
-# path to gtf file with transcripts (default = TAIR10.gtf)
-GTF		=		'TAIR10.gtf'
