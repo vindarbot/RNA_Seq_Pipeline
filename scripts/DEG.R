@@ -21,7 +21,8 @@ Usage:
 
 opts <- docopt(doc)
 
-lfc <- opts[['lfc']]  
+lfc <- opts[['lfc']]
+lfc <- as.numeric(lfc)  
 padj <- opts[['padj']]
 xpdesign <- opts[['xpdesign']]
 outprefix <- opts[['outprefix']]
@@ -42,7 +43,7 @@ colnames(featureMatrix) <- gsub("Mapping.", "", colnames(featureMatrix))
 
 featureMatrix <- as.matrix(featureMatrix)
 
-conditionTest <- factor(c(rep("Col",2), rep("Mutant", 3)))
+conditionTest <- factor(xpdesign$condition)
 
 MedianeParCondition = t(apply(featureMatrix, 1, tapply, 
                               conditionTest, median)) 
@@ -54,9 +55,11 @@ featureMatrix = featureMatrix[maxMedian >= 10,]
 
 
 
-(coldata <- data.frame(row.names=colnames(featureMatrix), conditionTest))
+(coldata <- data.frame(row.names=colnames(featureMatrix[,rownames(xpdesign)]), conditionTest))
+as.factor(xpdesign$condition)
+colnames(coldata)
 
-dds <- DESeqDataSetFromMatrix(countData=featureMatrix, colData=coldata, design= ~ conditionTest)
+dds <- DESeqDataSetFromMatrix(countData=featureMatrix[,rownames(xpdesign)], colData=coldata, design= ~ conditionTest)
 
 dds <- DESeq(dds)
 
@@ -149,9 +152,9 @@ genes_down <- (merge(x=symbol,y=genes_down,by.x="tair_locus",by.y="ID"))
 genes_down <- genes_down[c(1,2,4,8,9)]
 genes_down <- genes_down[order(genes_down$padj,decreasing = F),]
 
-  
-write_tsv(as.data.frame(genes_up),outprefix+"/genes_up.txt")
-write_tsv(as.data.frame(genes_down),outprefix+"/genes_down.txt")
+
+write_tsv(as.data.frame(genes_up),"DEG/genes_up.txt")
+write_tsv(as.data.frame(genes_down),"DEG/genes_down.txt")
 
 
 
