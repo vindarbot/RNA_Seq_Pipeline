@@ -6,7 +6,7 @@ import glob
 include: "config.py"
 
 
-
+RAWDATA_DIR = os.getcwd()
 
 FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
 
@@ -19,7 +19,6 @@ CONDITION_TO_SAMPLES = {}
 for condition in CONDITIONS:
 	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.startswith(condition)]
 
-print(CONDITION_TO_SAMPLES)
 
 
 DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG']
@@ -39,7 +38,9 @@ rule all:
 		"featureCounts/counts.txt",
 		"Reference/reference.fasta",
 		"reference.gtf",
-		"experimentalDesign.txt"
+		"experimentalDesign.txt",
+		"DEG/genes_up.txt",
+		"DEG/genes_down.txt"
 		
 
 
@@ -180,13 +181,15 @@ rule xpDesign: 		# Création d'un fichier txt qui décrit simplement le design e
 		with open("experimentalDesign.txt","w") as xpDesign:
 			xpDesign.write("batch,condition\n")
 
-			for condition in CONDITION_TO_SAMPLES:
-				for sample in condition:
+			for condition,samples in CONDITION_TO_SAMPLES.items():
+				for sample in samples:
 					xpDesign.write(sample+".sorted.bam,"+condition+"\n")
 
 
 rule degAnalysis:
 	input:
+		xpdesign = RAWDATA_DIR+"/experimentalDesign.txt",
+		counts = "featureCounts/counts.txt"
 
 	output:
 		"DEG/genes_up.txt",
@@ -194,7 +197,21 @@ rule degAnalysis:
 
 	params:
 		padj = pADJ,
-		lfc = LFC 
+		lfc = LFC,
+		description = RAWDATA_DIR+"/description.txt",
+		outprefix = RAWDATA_DIR+"/DEG"
+
+	message: ''' --- Analyse des gènes différentiellement exprimés (DESeq2) --- '''
+
+	shell: '''
+        Rscript scripts/DEG.R --padj={params.padj} \
+            --lfc={params.lfc} \
+            --xpdesign={input.xpdesign} \
+            --description={params.description} \
+            --outprefix={params.outprefix} \
+
+        '''
+
 
 
 
