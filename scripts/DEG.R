@@ -8,20 +8,22 @@ library(tidyverse)
 library(GenomicAlignments)
 library(biomaRt)
 library(ggplot2)
+library(DEXSeq)
+library(docopt)
 
 # library(stringr)
 #library(limma)
-dir = setwd("~/Desktop/SA8910")
+dir = setwd("~/Desktop/snakemake/Salmon")
 
-BiocManager::install("ggsashimi")
+BiocManager::install("docopt")
 
 
 ## Pour récupérer la liste des alignements
 
-bamfiles = BamFileList(dir(path = "Alignement/", pattern = "sorted.bam$"), yieldSize=100000)
+bamfiles = BamFileList(dir(path = "../Mapping/", pattern = "sorted.bam$"), yieldSize=100000)
 
 ## Pour récupérer le fichier annoté des gènes d'Arabidopsis, afin de compter le nombre de reads par gène.
-tair10_genes <- makeTxDbFromGFF("TAIR10.gtf", format="gtf", dataSource="TAIR", organism="Arabidopsis thaliana")
+tair10_genes <- makeTxDbFromGFF("reference_AA.gtf", format="gtf", dataSource="TAIR", organism="Arabidopsis thaliana")
 
 ## On regroupe selon les gènes.
 (ebg = exonsBy(tair10_genes, by="gene"))
@@ -31,7 +33,7 @@ xpdesign = read.csv("experimentalDesign.txt", row.names=1, sep=",")
 
 
 
-dir = setwd("Alignement")
+dir = setwd("~/Desktop/SNAKEMAKE")
 
 ## La fonction summarizeOverlaps prend le fichiers bam ainsi que le fichier annoté de gènes 
 ## afin de compter le nombre de reads correspondant à un gène.  Le mode union signifie que si une lecture 
@@ -45,6 +47,7 @@ se = summarizeOverlaps(features=ebg,
                        ignore.strand=TRUE, fragments = T )
 
 
+dir = setwd("Mapping/")
 dir = setwd("../")
 
 ## Création d'un tableau du nombre de reads compté
@@ -98,7 +101,7 @@ featureMatrix = featureMatrix[maxMedian >= 10,]
 
 ### FEATURE COUNTS
 
-featurescounts=read.csv("featureCounts/counts.txt", sep="", head=T, skip=1, row.names = "Geneid")
+featurescounts=read.csv("counts.txt", sep="", head=T, skip=1, row.names = "Geneid")
 
 
 
@@ -132,32 +135,27 @@ ggplot(data=pca.data, aes(x=X, y=Y, label=Sample)) +
 
 featureMatrix <- featurescounts[ ,6:ncol(featurescounts)]
   
-colnames(featureMatrix) <- gsub("Alignement.", "", colnames(featureMatrix))
+colnames(featureMatrix) <- gsub("Mapping.", "", colnames(featureMatrix))
 
 featureMatrix <- as.matrix(featureMatrix)
 
-test <- featureMatrix[,c(1,2,3,4,5,6,7)]
-
-
-(conditionTest <- factor(c(rep("col1", 4), rep("col2", 3))))
+conditionTest <- factor(c(rep("Col",2), rep("Mutant", 3)))
 
 MedianeParCondition = t(apply(test, 1, tapply, 
                               conditionTest, median)) 
 
 maxMedian=apply(MedianeParCondition, 1, max) 
 
-test = test[maxMedian >= 10,]
+featureMatrix = featureMatrix[maxMedian >= 10,]
 
 
 
 
-(coldata <- data.frame(row.names=colnames(test), conditionTest))
+(coldata <- data.frame(row.names=colnames(featureMatrix), conditionTest))
 
-dds = DESeqDataSetFromMatrix(countData=test, colData=coldata, design= ~ conditionTest)
+dds = DESeqDataSetFromMatrix(countData=featureMatrix, colData=coldata, design= ~ conditionTest)
 
 dds <- DESeq(dds)
-
-vignette("DESeq2")
 
 rld <- rlog(dds, blind = FALSE)
 
@@ -250,12 +248,12 @@ plotMA(res, ylim=c(-5,5))
 
 
 ## Gènes induits lorsque le gène testé est muté
-genes_up = res[ which(res$padj < 0.1 & res$log2FoldChange > 1), ]
+genes_up = res[ which(res$padj < 0.11 & res$log2FoldChange > 1), ]
 
 genes_up <- genes_up[order(genes_up$padj, decreasing = F),]
 
 ## Gènes réprimés lorsque le gène testé est muté
-genes_down = res[ which(res$padj < 0.1 & res$log2FoldChange < -1), ]
+genes_down = res[ which(res$padj < 0.11 & res$log2FoldChange < -1), ]
 
 genes_down <- genes_down[order(genes_down$padj, decreasing = F),]
 
@@ -324,9 +322,9 @@ genes_down <- genes_down[c(1,2,4,8,9)]
 genes_down <- genes_down[order(genes_down$padj,decreasing = F),]
 
   
-write_tsv(as.data.frame(genes_up),"~/Desktop/Col0_Manu_up.txt")
-write_tsv(as.data.frame(genes_down),"~/Desktop/Col0_Manu_down.txt")
-write_tsv(as.data.frame(identifiants),"~/Desktop/1.txt")
+write_tsv(as.data.frame(genes_up),"~/Desktop/genes_up.txt")
+write_tsv(as.data.frame(genes_down),"~/Desktop/genes_down.txt")
+write_tsv(as.data.frame(identifiants),"~/Desktop/id.txt")
 
 
 
@@ -353,4 +351,16 @@ summary(overRepresented)[,c(1,2,5,6,7)]
 
 counts_norm <- counts(cds, normalized = T)
 
-?counts
+
+
+
+
+
+
+
+
+
+
+
+?DEXSeq
+

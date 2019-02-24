@@ -38,3 +38,9 @@ hdist    =		1
 ### Mapping
 
 
+
+
+### DEG Analysis
+
+pADJ	=		0.11
+LFC		= 		1

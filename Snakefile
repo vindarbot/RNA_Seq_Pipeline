@@ -14,9 +14,15 @@ SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
 
 CONDITIONS = list(set(x.split("_")[0] for x in SAMPLES))
 
+CONDITION_TO_SAMPLES = {}
+
+for condition in CONDITIONS:
+	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.startswith(condition)]
+
+print(CONDITION_TO_SAMPLES)
 
 
-DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts']
+DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG']
 
 for path in DIRS:
 	if not os.path.exists(path):
@@ -24,7 +30,7 @@ for path in DIRS:
 
 
 
-rule all:
+rule all:	
 	input:
 		expand('Trimming/{sample}_R1.trim.fastq', sample=SAMPLES),
 		expand("Mapping/{sample}.bam", sample=SAMPLES),
@@ -32,24 +38,30 @@ rule all:
 		expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES),
 		"featureCounts/counts.txt",
 		"Reference/reference.fasta",
-		"reference.gtf"
+		"reference.gtf",
+		"experimentalDesign.txt"
 		
 
 
 FASTA_NAME = os.path.basename(GET_GENOME)
 GTF_NAME = os.path.basename(GET_GTF)
+DESCRIPTION_NAME = os.path.basename(GET_DESCRIPTION)
 
 
-rule get_reference_files:
+rule get_reference_files:	# Règle qui récupère le génome de référence ainsi que le fichier
+							# d'annotation des gènes d'une espèce donnée
 	output:
 		fasta = "Reference/reference.fasta",
-		gtf = "reference.gtf"
+		gtf = "reference.gtf",
+		description = "description.txt"
+
 	params:
 		get_genome = GET_GENOME,
 		get_gtf = GET_GTF,
 		get_description = GET_DESCRIPTION,
 		fasta_name = FASTA_NAME,
-		gtf_name = GTF_NAME
+		gtf_name = GTF_NAME,
+		description_name = DESCRIPTION_NAME
 
 	message: ''' --- downloading fasta and gtf files --- '''
 
@@ -61,10 +73,11 @@ rule get_reference_files:
 		gffread reference_clean.gff -T -o {output.gtf}
 		rm reference_clean.gff
 		wget {params.get_description}
+		mv {params.description_name} {output.description}
 		'''
 
 
-rule trimming:
+rule trimming: 		# Contrôle qualité des données fastq brutes.
 	input:
 	    adapters = ADAPTERS,
 	    r1 = 'Experience/{sample}_R1.fastq.gz',
@@ -84,7 +97,7 @@ GENOME = "Reference/reference.fasta"
 GTF = "reference.gtf"
 
 
-rule indexation_genome:
+rule indexation_genome:		# Indexation du génome de référence 
 	input:
 		genome = GENOME,
 		gtf = GTF,
@@ -100,7 +113,7 @@ rule indexation_genome:
 	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {input.starref} --genomeFastaFiles {input.genome}'
 
 
-rule mapping_PE:
+rule mapping_PE:		
 	input:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
@@ -156,6 +169,34 @@ rule featureCounts:
 	threads: 16
 
 	shell: ''' featureCounts -T {threads} -p -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
+
+
+
+rule xpDesign: 		# Création d'un fichier txt qui décrit simplement le design expérimental, ceci est nécessaire pour l'étape d'analyse des gènes différentiellement exprimés sous R
+	output:
+		"experimentalDesign.txt"
+
+	run:
+		with open("experimentalDesign.txt","w") as xpDesign:
+			xpDesign.write("batch,condition\n")
+
+			for condition in CONDITION_TO_SAMPLES:
+				for sample in condition:
+					xpDesign.write(sample+".sorted.bam,"+condition+"\n")
+
+
+rule degAnalysis:
+	input:
+
+	output:
+		"DEG/genes_up.txt",
+		"DEG/genes_down.txt"
+
+	params:
+		padj = pADJ,
+		lfc = LFC 
+
+
 
 
 
