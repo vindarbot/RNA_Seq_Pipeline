@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import sys
 import re
@@ -26,16 +28,6 @@ for condition in CONDITIONS:
 	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.startswith(condition)]
 
 
-print(RAWDATA_DIR)
-
-print()
-
-print(FILES)
-
-print()
-
-print(SAMPLES) 
-
 DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG']
 
 for path in DIRS:
@@ -46,14 +38,6 @@ for path in DIRS:
 
 rule all:	
 	input:
-		expand('Trimming/{sample}.trim.fastq', sample=SAMPLES),
-		expand("Mapping/{sample}.bam", sample=SAMPLES),
-		expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
-		expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES),
-		"featureCounts/counts.txt",
-		"Reference/reference.fasta",
-		"reference.gtf",
-		"experimentalDesign.txt",
 		"DEG/genes_up.txt",
 		"DEG/genes_down.txt"
 	
@@ -110,36 +94,40 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 		mv {params.description_name} {output.description}
 		'''
 
-if PAIRED_END:
-	rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
-		input:
-		    adapters = ADAPTERS,
-		    r1 = 'Experience/{sample}_R1.fastq.gz',
-		    r2 = 'Experience/{sample}_R2.fastq.gz'
 
-		output:
-		    r1 = 'Trimming/{sample}_R1.trim.fastq',
-		    r2 = 'Trimming/{sample}_R2.trim.fastq'
 
-		message: ''' --- Trimming  --- '''
 
-		shell: ' bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
-		    ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo '
+rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
+	input:
+		adapters = ADAPTERS,
+		r1 = 'Experience/{sample}_R1.fastq.gz',
+		r2 = 'Experience/{sample}_R2.fastq.gz'
 
-else:
+	output:
+		r1 = 'Trimming/{sample}_R1.trim.fastq',
+		r2 = 'Trimming/{sample}_R2.trim.fastq'
 
-	rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
-		input:
-		    adapters = ADAPTERS,
-		    r = 'Experience/{sample}.fastq.gz'
+	message: ''' --- Trimming  --- '''
 
-		output:
-		    r = 'Trimming/{sample}.trim.fastq'
+	shell: ' bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
+		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo '
 
-		message: ''' --- Trimming  --- '''
 
-		shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
-		    ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo '
+
+
+rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
+	input:
+		adapters = ADAPTERS,
+		r = 'Experience/{sample}.fastq.gz'
+
+	output:
+		r = 'Trimming/{sample}.trim.fastq'
+
+	message: ''' --- Trimming  --- '''
+
+	shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
+		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo '
+
 
 
 
@@ -163,46 +151,44 @@ rule indexation_genome:		# Indexation du génome de référence
 	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --genomeDir {input.starref} --genomeFastaFiles {input.genome}'
 
 
-if PAIRED_END:
-	rule mapping_PE:		
-		input:
-			gtf = GTF,
-			index = "Reference/star/chrName.txt",
-			starref = 'Reference/star/',
-			r1 = 'Trimming/{sample}_R1.trim.fastq',
-			r2 = 'Trimming/{sample}_R2.trim.fastq'
+rule mapping_PE:		
+	input:
+		gtf = GTF,
+		index = "Reference/star/chrName.txt",
+		starref = 'Reference/star/',
+		r1 = 'Trimming/{sample}_R1.trim.fastq',
+		r2 = 'Trimming/{sample}_R2.trim.fastq'
 
-		output:
-			"Mapping/{sample}.bam"
+	output:
+		"Mapping/{sample}.bam"
 
-		message: ''' --- Alignement des lectures --- '''
+	message: ''' --- Alignement des lectures --- '''
 
-		threads: 4
+	threads: 4
 
-		shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --sjdbOverhang '+str(READ_LENGHT-1)+' --genomeDir {input.starref} \
+	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --sjdbOverhang '+str(READ_LENGHT-1)+' --genomeDir {input.starref} \
 		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r1} {input.r2} --outSAMtype BAM SortedByCoordinate; \
 		mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
 
-else:
 
-	rule mapping_SE:		
-		input:
-			gtf = GTF,
-			index = "Reference/star/chrName.txt",
-			starref = 'Reference/star/',
-			r = 'Trimming/{sample}.trim.fastq'
 
-		output:
-			"Mapping/{sample}.bam"
+rule mapping_SE:		
+	input:
+		gtf = GTF,
+		index = "Reference/star/chrName.txt",
+		starref = 'Reference/star/',
+		r = 'Trimming/{sample}.trim.fastq'
 
-		message: ''' --- Alignement des lectures --- '''
+	output:
+		"Mapping/{sample}.bam"
 
-		threads: 4
+	message: ''' --- Alignement des lectures --- '''
 
-		shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --genomeDir {input.starref} \
+	threads: 4
+
+	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --genomeDir {input.starref} \
 		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r} --outSAMtype BAM SortedByCoordinate; \
 		mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
-
 
 
 
@@ -216,6 +202,7 @@ rule sort_bam:
 	threads: 16
 
 	shell: ''' samtools sort {input} -o {output} -@ {threads} '''
+
 
 
 rule index_bam:
