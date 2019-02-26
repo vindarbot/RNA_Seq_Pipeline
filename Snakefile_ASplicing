@@ -157,10 +157,10 @@ rule mapping_SE:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
 		starref = 'Reference/star/',
-		r = 'Trimming/{sample}.trim.fastq'
+		r = expand('Trimming/{sample}.trim.fastq',sample=SAMPLES)
 
 	output:
-		"Mapping/{sample}.bam"
+		expand("Mapping/{sample}.bam",sample=SAMPLES)
 
 	message: ''' --- Alignement des lectures --- '''
 
