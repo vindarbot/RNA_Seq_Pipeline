@@ -177,10 +177,10 @@ rule mapping_SE:
 
 rule index_bam:
 	input:
-		"Mapping/{sample}SortedByCoordinate.bam"
+		"Mapping/{sample}Aligned.sortedByCoord.bam"
 
 	output:
-		"Mapping/{sample}SortedByCoordinate.bam.bai"
+		"Mapping/{sample}Aligned.sortedByCoord.bam.bai"
 
 	shell: ''' samtools index {input} > {output} '''
 
