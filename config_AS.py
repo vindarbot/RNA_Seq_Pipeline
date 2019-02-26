@@ -12,7 +12,7 @@
 
 PAIRED_END = False
 
-READ_LENGHT = 	150
+READ_LENGHT = 	100
 
 GET_GENOME	=	"https://ics.hutton.ac.uk/atRTD/RTD2/AtRTDv2_QUASI_19April2016.fa"
 
@@ -24,17 +24,12 @@ GET_DESCRIPTION = "https://www.arabidopsis.org/download_files/Genes/TAIR10_genom
 
 TRIMMING =		True
 
-# path to adapters
-ADAPTERS =		"~/happy_bin/bbmap/resources/adapters.fa"
 
-# minimum length of reads to keep after trimming
-minlen   =		25 
+# rMATS demande en entrée une longeur de reads spécifique, on trim donc tous les reads de 13bp en 3' (même les reads n'ayant pas d'adaptapteurs)
+CUT_TRIM   =		13
 
-ktrim    =		"r" 
-k        =		22 
-qtrim    =		"rl" 
-trimq    =		10 
-hdist    =		1
+READ_LENGHT_TRIM = READ_LENGHT-CUT_TRIM
+
 
 
 ### Mapping

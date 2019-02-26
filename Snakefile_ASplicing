@@ -38,8 +38,13 @@ for path in DIRS:
 
 rule all:	
 	input:
+		"experimentalDesign.txt"
+		fasta = "Reference/reference.fasta",
+		gtf = "reference.gtf",
+		description = "description.txt"
 		"DEG/genes_up.txt",
 		"DEG/genes_down.txt"
+		r = 'Trimming/{sample}.trim.fastq'
 	
 
 
@@ -117,16 +122,18 @@ rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
 
 rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
 	input:
-		adapters = ADAPTERS,
 		r = 'Experience/{sample}.fastq.gz'
 
 	output:
-		r = 'Trimming/{sample}.trim.fastq'
+		'Trimming/{sample}.trim.fastq'
+
+	params:
+		cut_lenght = CUT_LENGHT
 
 	message: ''' --- Trimming  --- '''
 
-	shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
-		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo '
+	shell: ' cutadapt -u {cut_lenght} -o {output} {input} '
+		
 
 
 
