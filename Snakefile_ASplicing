@@ -131,6 +131,9 @@ rule trimming_PE:
 
 
 
+GENOME = "Reference/reference.fasta"
+GTF = "reference.gtf"
+
 
 rule indexation_genome:		# Indexation du génome de référence 
 	input:
