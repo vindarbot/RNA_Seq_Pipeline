@@ -6,7 +6,7 @@ import re
 import glob
 
 
-include: "config.py"
+include: "config_AS.py"
 
 
 RAWDATA_DIR = os.getcwd()
