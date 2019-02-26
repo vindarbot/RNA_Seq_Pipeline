@@ -38,7 +38,7 @@ for path in DIRS:
 
 rule all:	
 	input:
-		expand("Mapping/{sample}.bam", sample=SAMPLES)
+		"Mapping/{sample}.bam"
 
 	
 
@@ -157,10 +157,10 @@ rule mapping_SE:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
 		starref = 'Reference/star/',
-		r = expand('Trimming/{sample}.trim.fastq',sample=SAMPLES)
+		r = 'Trimming/{sample}.trim.fastq'
 
 	output:
-		expand("Mapping/{sample}.bam",sample=SAMPLES)
+		"Mapping/{sample}.bam"
 
 	message: ''' --- Alignement des lectures --- '''
 
@@ -177,8 +177,27 @@ rule mapping_SE:
 
 
 
+rule sort_bam:
+	input:
+		"Mapping/{sample}.bam"
+
+	output:
+		"Mapping/{sample}.sorted.bam"
+
+	threads: 16
+
+	shell: ''' samtools sort {input} -o {output} -@ {threads} '''
 
 
+
+rule index_bam:
+	input:
+		"Mapping/{sample}.sorted.bam"
+
+	output:
+		"Mapping/{sample}.sorted.bam.bai"
+
+	shell: ''' samtools index {input} > {output} '''
 
 
 
