@@ -148,7 +148,16 @@ rule indexation_genome:		# Indexation du génome de référence
 
 	message: ''' --- Indexation du génome de référence --- '''
 
-	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --limitGenomeGenerateRAM 57455000960 \
+	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate  \
 	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
+
+
+
+
+
+
+
+
+
 
 
