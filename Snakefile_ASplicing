@@ -38,7 +38,6 @@ for path in DIRS:
 
 rule all:	
 	input:
-		r = expand('Trimming/{sample}.trim.fastq', sample=SAMPLES),
 		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
