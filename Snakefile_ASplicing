@@ -152,6 +152,31 @@ rule indexation_genome:		# Indexation du génome de référence
 	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
 
 
+rule mapping_SE:		
+	input:
+		gtf = GTF,
+		index = "Reference/star/chrName.txt",
+		starref = 'Reference/star/',
+		r = 'Trimming/{sample}.trim.fastq'
+
+	output:
+		"Mapping/{sample}.bam"
+
+	message: ''' --- Alignement des lectures --- '''
+
+	threads: 4
+
+	shell: ' STAR --runThreadN {threads} \
+	--sjdbGTFfile {input.gtf} \
+	--genomeDir {input.starref} \
+	--outFileNamePrefix Mapping/{wildcards.sample} \
+	--readFilesIn {input.r} \
+	--alignEndsType EndToEnd \
+	--outSAMtype BAM SortedByCoordinate; \
+	mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
+
+
+
 
 
 

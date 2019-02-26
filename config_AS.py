@@ -30,8 +30,6 @@ CUT_TRIM   =		13
 
 READ_LENGHT_TRIM = READ_LENGHT-CUT_TRIM
 
-
-
 ### Mapping
 
 
