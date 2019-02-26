@@ -96,20 +96,19 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 
 
 
-rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
+rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
 	input:
-		adapters = ADAPTERS,
-		r1 = 'Experience/{sample}_R1.fastq.gz',
-		r2 = 'Experience/{sample}_R2.fastq.gz'
+		r = 'Experience/{sample}.fastq.gz'
 
 	output:
-		r1 = 'Trimming/{sample}_R1.trim.fastq',
-		r2 = 'Trimming/{sample}_R2.trim.fastq'
+		'Trimming/{sample}.trim.fastq'
+
+	params:
+		cut_lenght = CUT_LENGHT
 
 	message: ''' --- Trimming  --- '''
 
-	shell: ' bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
-		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo '
+	shell: ' cutadapt -u {cut_lenght} -o {output} {input} '
 
 
 
