@@ -38,12 +38,12 @@ for path in DIRS:
 
 rule all:	
 	input:
-		"experimentalDesign.txt"
+		"experimentalDesign.txt",
 		fasta = "Reference/reference.fasta",
 		gtf = "reference.gtf",
-		description = "description.txt"
+		description = "description.txt",
 		"DEG/genes_up.txt",
-		"DEG/genes_down.txt"
+		"DEG/genes_down.txt",
 		r = 'Trimming/{sample}.trim.fastq'
 	
 
