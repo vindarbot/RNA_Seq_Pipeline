@@ -10,6 +10,9 @@
 
 ### General
 
+RMATS = '/data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py'
+
+
 PAIRED_END = False
 
 READ_LENGHT = 	100
@@ -34,8 +37,3 @@ READ_LENGHT_TRIM = READ_LENGHT-CUT_TRIM
 
 
 
-
-### DEG Analysis
-
-pADJ	=		0.11
-LFC		= 		1

@@ -172,17 +172,20 @@ rule mapping_SE:
 	--outFileNamePrefix Mapping/{wildcards.sample} \
 	--readFilesIn {input.r} \
 	--alignEndsType EndToEnd \
-	--outSAMtype BAM SortedByCoordinate'
+	--outSAMtype BAM SortedByCoordinate; \
+	mv Mapping/{sample}Aligned.sortedByCoord.out.bam {output}\
+	mv Mapping/{sample}*out* Mapping/Out'
 
 
 rule index_bam:
 	input:
-		"Mapping/{sample}Aligned.sortedByCoord.bam"
+		"Mapping/{sample}.bam"
 
 	output:
-		"Mapping/{sample}Aligned.sortedByCoord.bam.bai"
+		"Mapping/{sample}.bam.bai"
 
 	shell: ''' samtools index {input} > {output} '''
+
 
 
 
