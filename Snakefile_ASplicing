@@ -39,6 +39,7 @@ for path in DIRS:
 rule all:	
 	input:
 		r = expand('Trimming/{sample}.trim.fastq', sample=SAMPLES)
+
 	
 
 
@@ -96,7 +97,7 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 
 
 
-rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
+rule trimming_SE: 		
 	input:
 		r = 'Experience/{sample}.fastq.gz'
 
@@ -112,6 +113,39 @@ rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
 
 
 
+rule trimming_PE: 		
+	input:
+		r1 = 'Experience/{sample}_R1.fastq.gz',
+		r2 = 'Experience/{sample}_R2.fastq.gz'
 
+	output:
+		r1 = 'Trimming/{sample}_R1.trim.fastq',
+		r2 = 'Trimming/{sample}_R2.trim.fastq'
+
+	params:
+		cut_trim = CUT_TRIM
+
+	message: ''' --- Trimming  --- '''
+
+	shell: ' cutadapt -u {params.cut_trim} -U {params.cut_trim} -o {output.r1} -p {output.r2} {input.r1} {input.r2} '
+
+
+
+
+rule indexation_genome:		# Indexation du génome de référence 
+	input:
+		genome = GENOME,
+		gtf = GTF,
+		starref = 'Reference/star/'
+
+	output:
+		"Reference/star/chrName.txt"
+
+	threads: 16
+
+	message: ''' --- Indexation du génome de référence --- '''
+
+	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate \
+	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
 
 
