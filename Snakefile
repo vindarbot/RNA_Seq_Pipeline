@@ -184,7 +184,7 @@ rule mapping_SE:
 
 	message: ''' --- Alignement des lectures --- '''
 
-	threads: 4
+	threads: 6
 
 	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --genomeDir {input.starref} \
 		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r} --outSAMtype BAM SortedByCoordinate; \
