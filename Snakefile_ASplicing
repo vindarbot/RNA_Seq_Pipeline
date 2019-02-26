@@ -113,7 +113,7 @@ rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
 
 
 
-rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
+rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
 	input:
 		r = 'Experience/{sample}.fastq.gz'
 
@@ -121,11 +121,11 @@ rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
 		'Trimming/{sample}.trim.fastq'
 
 	params:
-		cut_lenght = CUT_LENGHT
+		cut_trim = CUT_TRIM
 
 	message: ''' --- Trimming  --- '''
 
-	shell: ' cutadapt -u {cut_lenght} -o {output} {input} '
+	shell: ' cutadapt -u {params.cut_trim} -o {output} {input} '
 		
 
 
