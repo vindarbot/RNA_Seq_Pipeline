@@ -25,7 +25,7 @@ GET_DESCRIPTION = "https://www.arabidopsis.org/download_files/Genes/TAIR10_genom
 TRIMMING =		True
 
 # path to adapters
-ADAPTERS =		"/happy_bin/bbmap/resources/adapters.fa"
+ADAPTERS =		"~/happy_bin/bbmap/resources/adapters.fa"
 
 # minimum length of reads to keep after trimming
 minlen   =		25 
