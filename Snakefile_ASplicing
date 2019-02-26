@@ -144,11 +144,11 @@ rule indexation_genome:		# Indexation du génome de référence
 	output:
 		"Reference/star/chrName.txt"
 
-	threads: 16
+	threads: 8
 
 	message: ''' --- Indexation du génome de référence --- '''
 
-	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate \
+	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --limitGenomeGenerateRAM 57455000960 \
 	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
 
 
