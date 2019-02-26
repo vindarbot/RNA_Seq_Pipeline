@@ -172,30 +172,15 @@ rule mapping_SE:
 	--outFileNamePrefix Mapping/{wildcards.sample} \
 	--readFilesIn {input.r} \
 	--alignEndsType EndToEnd \
-	--outSAMtype BAM SortedByCoordinate; \
-	mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
-
-
-
-rule sort_bam:
-	input:
-		"Mapping/{sample}.bam"
-
-	output:
-		"Mapping/{sample}.sorted.bam"
-
-	threads: 16
-
-	shell: ''' samtools sort {input} -o {output} -@ {threads} '''
-
+	--outSAMtype BAM SortedByCoordinate'
 
 
 rule index_bam:
 	input:
-		"Mapping/{sample}.sorted.bam"
+		"Mapping/{sample}SortedByCoordinate.bam"
 
 	output:
-		"Mapping/{sample}.sorted.bam.bai"
+		"Mapping/{sample}SortedByCoordinate.bam.bai"
 
 	shell: ''' samtools index {input} > {output} '''
 
