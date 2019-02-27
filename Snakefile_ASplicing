@@ -179,7 +179,7 @@ rule mapping_SE:
 	--readFilesIn {input.r} \
 	--alignEndsType EndToEnd \
 	--outSAMtype BAM SortedByCoordinate; \
-	mv Mapping/{sample}Aligned.sortedByCoord.out.bam {output}\
+	mv Mapping/{sample}Aligned.sortedByCoord.out.bam {output};\
 	mv Mapping/{sample}*out* Mapping/Out'
 
 
