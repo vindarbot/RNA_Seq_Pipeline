@@ -199,7 +199,7 @@ rule rMATs_Con_Bas:
         Bas = expand('Mapping/{sample}.bam', sample=BAS_SAMPLES)
     params:
         outdir = 'rMATS'
-        
+
     output: 'alternative_splicing_rMATS/All_T1_vs_T0/MATS_output/AS_Event.MATS.JunctionCountOnly.txt'
 
     run:
@@ -209,10 +209,10 @@ rule rMATs_Con_Bas:
         star_index = STAR_INDEX
 
         shell(r'''python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py \
-        	-b1 {b1} -b2 {b2} -len 87 -gtf {gtf} \
+        	-b1 {b1} -b2 {b2} -len 87 -t single -gtf {gtf} \
         	-bi {star_index} -o {params.outdir} 1>&2''')
 
 
-
+#nohup python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py --b1 b1.txt --b2 b2.txt --readLength 87 -t single --gtf reference.gtf --bi Reference/star/ --od rMATS &
 
 
