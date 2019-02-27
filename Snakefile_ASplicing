@@ -44,7 +44,7 @@ for path in DIRS:
 
 rule all:	
 	input:
-		expand("Mapping/{sample}.bam.bai", sample=SAMPLES)
+		expand("Mapping/{sample}.bam.bai", sample=SAMPLES),
 		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
