@@ -13,9 +13,9 @@
 RMATS = '/data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py'
 
 
-PAIRED_END = False
+PAIRED_END = True
 
-READ_LENGHT = 	100
+READ_LENGHT = 	150
 
 GET_GENOME	=	"https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_chromosome_files/TAIR10_chr_all.fas"
 
