@@ -28,11 +28,11 @@ for condition in CONDITIONS:
 	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.startswith(condition)]
 
 
-DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG']
+# DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG']
 
-for path in DIRS:
-	if not os.path.exists(path):
-		os.mkdir(path)
+# for path in DIRS:
+# 	if not os.path.exists(path):
+# 		os.mkdir(path)
 
 
 
