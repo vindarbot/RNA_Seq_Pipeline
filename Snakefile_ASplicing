@@ -242,6 +242,6 @@ rule index_bam:
 #         	-bi {star_index} -o {params.outdir} 1>&2''')
 
 
-#nohup python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py --b1 b1.txt --b2 b2.txt --readLength 87 -t single --gtf reference.gtf --bi Reference/star/ --od rMATS &
+nohup python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py --b1 b1.txt --b2 b2.txt --readLength 139 -t paired --gtf reference.gtf --bi Reference/star/ --od rMATS &
 
 

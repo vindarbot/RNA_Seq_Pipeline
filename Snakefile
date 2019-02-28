@@ -28,18 +28,17 @@ for condition in CONDITIONS:
 	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.startswith(condition)]
 
 
-# DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG']
+DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG','DTE']
 
-# for path in DIRS:
-# 	if not os.path.exists(path):
-# 		os.mkdir(path)
+for path in DIRS:
+	if not os.path.exists(path):
+		os.mkdir(path)
 
 
 
 rule all:	
 	input:
-		"DEG/genes_up.txt",
-		"DEG/genes_down.txt"
+		expand("DTE/{sample}/quant.sf", sample=SAMPLES)
 	
 
 
@@ -63,6 +62,7 @@ rule xpDesign: 		# Création d'un fichier txt qui décrit simplement le design e
 
 FASTA_NAME = os.path.basename(GET_GENOME)
 GTF_NAME = os.path.basename(GET_GTF)
+TRANSCRIPTO_NAME = os.path.basename(GET_TRANSCRIPTO)
 DESCRIPTION_NAME = os.path.basename(GET_DESCRIPTION)
 
 
@@ -71,6 +71,7 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 	output:
 		fasta = "Reference/reference.fasta",
 		gtf = "reference.gtf",
+		transcripto = "transcriptome.fasta",
 		description = "description.txt"
 
 	params:
@@ -79,12 +80,15 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 		get_description = GET_DESCRIPTION,
 		fasta_name = FASTA_NAME,
 		gtf_name = GTF_NAME,
+		get_transcripto = GET_TRANSCRIPTO,
+		transcripto_name = TRANSCRIPTO_NAME,
 		description_name = DESCRIPTION_NAME
 
 	message: ''' --- downloading fasta and gtf files --- '''
 
 	shell: ''' 
 		wget {params.get_genome}; mv {params.fasta_name} {output.fasta}
+		wget {params.get_transcripto}; mv {params.transcripto_name} {output.transcripto}
 		wget {params.get_gtf}; mv {params.gtf_name} reference.gff
 		awk '{{ sub(/'ChrM'/,"mitochondria"); sub(/'ChrC'/,"chloroplast"); sub(/'Chr'/,"");print}}' reference.gff > reference_clean.gff
 		rm reference.gff
@@ -133,6 +137,7 @@ rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
 
 GENOME = "Reference/reference.fasta"
 GTF = "reference.gtf"
+TRANSCRIPTOME = "Reference/transcriptome.fasta"
 
 
 rule indexation_genome:		# Indexation du génome de référence 
@@ -257,6 +262,32 @@ rule DESeq2:
             --outprefix={params.outprefix} \
 
         '''
+
+
+
+
+rule salmonQuant:
+	input:
+		transcriptome = TRANSCRIPTOME,
+		r1 = 'Trimming/{sample}_R1.trim.fastq',
+		r2 = 'Trimming/{sample}_R2.trim.fastq'
+
+
+	output:
+		"DTE/{sample}/quant.sf"
+
+	params:
+		index = "Reference/Index_salmon",
+		boots = 30 
+
+	threads: 8
+
+	shell: ''' salmon index -t {input.transcriptome} -i {params.index} -p {threads}; \
+	salmon quant -i {params.index} -l A -p {threads} -1 {input.r1} -2 {input.r2} -o "DTE/{wildcards.sample}" --numBootstraps {params.boots} '''
+
+
+
+
 
 
 
