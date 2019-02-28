@@ -181,7 +181,7 @@ if PAIRED_END:
 		--readFilesIn {input.r1} {input.r2} \
 		--alignEndsType EndToEnd \
 		--outSAMtype BAM SortedByCoordinate; \
-		mv Mapping/{wildcards.sample}Aligned.sortedByCoord.out.bam {output}\
+		mv Mapping/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};\
 		mv Mapping/{wildcards.sample}*out* Mapping/Out'		
 		
 
@@ -207,7 +207,7 @@ else:
 		--readFilesIn {input.r} \
 		--alignEndsType EndToEnd \
 		--outSAMtype BAM SortedByCoordinate; \
-		mv Mapping/{sample}Aligned.sortedByCoord.out.bam {output}\
+		mv Mapping/{sample}Aligned.sortedByCoord.out.bam {output};\
 		mv Mapping/{sample}*out* Mapping/Out'
 
 
