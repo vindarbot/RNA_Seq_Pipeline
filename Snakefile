@@ -28,7 +28,7 @@ for condition in CONDITIONS:
 	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.startswith(condition)]
 
 
-DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG','DTE']
+DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG','DTE','DEU','DEU/counts']
 
 for path in DIRS:
 	if not os.path.exists(path):
@@ -38,8 +38,7 @@ for path in DIRS:
 
 rule all:	
 	input:
-		expand("DTE/{sample}/quant.sf", sample=SAMPLES)
-	
+		lala = expand("DEU/counts/{sample}.counts.tsv", sample=SAMPLES)
 
 
 
@@ -70,7 +69,7 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 							# d'annotation des gènes d'une espèce donnée
 	output:
 		fasta = "Reference/reference.fasta",
-		gtf = "reference.gtf",
+		gtf = "Reference/reference.gtf",
 		transcripto = "transcriptome.fasta",
 		description = "description.txt"
 
@@ -136,7 +135,7 @@ rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
 
 
 GENOME = "Reference/reference.fasta"
-GTF = "reference.gtf"
+GTF = "Reference/reference.gtf"
 TRANSCRIPTOME = "Reference/transcriptome.fasta"
 
 
@@ -173,7 +172,8 @@ rule mapping_PE:
 
 	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --sjdbOverhang '+str(READ_LENGHT-1)+' --genomeDir {input.starref} \
 		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r1} {input.r2} --outSAMtype BAM SortedByCoordinate; \
-		mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
+		mv Mapping/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};\
+		mv Mapping/{wildcards.sample}*out* Mapping/Out'		
 
 
 
@@ -212,10 +212,10 @@ rule sort_bam:
 
 rule index_bam:
 	input:
-		"Mapping/{sample}.sorted.bam"
+		expand("Mapping/{sample}.sorted.bam", sample=SAMPLES)
 
 	output:
-		"Mapping/{sample}.sorted.bam.bai"
+		expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
 
 	shell: ''' samtools index {input} > {output} '''
 
@@ -234,6 +234,24 @@ rule featureCounts:
 	threads: 16
 
 	shell: ''' featureCounts -T {threads} -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
+
+
+rule featureCounts_CDS:
+	input:
+		mapping = expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
+		index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
+
+	output:
+		"DEU/counts/featureCounts.txt"
+
+	params:
+		gtf = GTF
+
+	threads: 16
+
+	shell: ''' featureCounts -T {threads} -t CDS -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
+
+
 
 
 
@@ -264,7 +282,7 @@ rule DESeq2:
         '''
 
 
-
+### Analyse des transcrits différentiellement exprimés (quantification avec Salmon, analyse avec Sleuth)
 
 rule salmonQuant:
 	input:
@@ -285,6 +303,42 @@ rule salmonQuant:
 	shell: ''' salmon index -t {input.transcriptome} -i {params.index} -p {threads}; \
 	salmon quant -i {params.index} -l A -p {threads} -1 {input.r1} -2 {input.r2} -o "DTE/{wildcards.sample}" --numBootstraps {params.boots} '''
 
+
+
+
+
+##### Analyse des exons différentiellement exprimés (DEXSEQ)
+
+DEXSEQ_PATH = '/Library/Frameworks/R.framework/Versions/3.5/Resources/library/DEXSeq'
+
+rule prepare_annotation_for_dexseq:
+    input: GTF
+
+    output: 
+    	'Reference/reference.DEXSeq.gff'
+
+    params:
+    	dexseq_path = DEXSEQ_PATH
+
+    message: ''' Création du fichier GFF (nécessaire à DEXSEQ) '''
+
+    shell:'''python2 {params.dexseq_path}/python_scripts/dexseq_prepare_annotation.py {input} {output} 
+        '''
+
+
+
+rule deseq_count:
+	input: 
+ 		'Reference/reference.DEXSeq.gff'
+
+	output: 
+    	expand('DEU/counts/{sample}.counts.tsv', sample=SAMPLES)
+
+	params:
+    	dexseq_path = DEXSEQ_PATH
+
+	shell:''' python2 {params.dexseq_path}/python_scripts/dexseq_count.py -p yes -s yes -r pos -f sam {input} <(samtools view -O SAM Mapping/{wildcards.sample}.sorted.bam) {output}
+        '''
 
 
 

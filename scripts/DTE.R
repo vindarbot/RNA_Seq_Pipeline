@@ -12,6 +12,10 @@ library(tximport)
 library(DESeq2)
 library(DRIMSeq)
 
+source("https://bioconductor.org/biocLite.R")
+pkgs <- rownames(installed.packages())
+biocLite(pkgs, type="source")
+
 dir = setwd("~/Desktop/Data")
 
 list.files(system.file("extdata", package = "tximportData"))
@@ -47,7 +51,12 @@ results <- sleuth_results(so, 'reduced:full', 'lrt', show_all = FALSE)
 
 sign <- results[which(results$qval<0.1),]
 
-write_tsv(as.data.frame(sign),"~/Desktop/Data/DTEresults.txt")
+write.table(as.data.frame(sign),"~/Desktop/Data/DTE/results_AtRTD2.txt")
+
+
+
+
+
 
 TxDb <- makeTxDbFromGFF("reference.gtf", format="gtf", dataSource="TAIR", organism="Arabidopsis thaliana")
 
@@ -74,24 +83,24 @@ so_gene <- sleuth_prep(sfdata, ~condition,target_mapping = ttg,aggregation_colum
 
 
 
-Col_1 <- read_tsv("Resultats/Col_1/quant.sf")
-Col_2 <- read_tsv("Resultats/Col_2/quant.sf")
-hon4_1 <- read_tsv("Resultats/hon4_1/quant.sf")
-hon4_2 <- read_tsv("Resultats/hon4_2/quant.sf")
-hon4_3 <- read_tsv("Resultats/hon4_3/quant.sf")
+Col_1 <- read_tsv("DTE/Col_1/quant.sf")
+Col_2 <- read_tsv("DTE/Col_2/quant.sf")
+hon4_1 <- read_tsv("DTE/hon4_1/quant.sf")
+hon4_2 <- read_tsv("DTE/hon4_2/quant.sf")
+hon4_3 <- read_tsv("DTE/hon4_3/quant.sf")
 
 
 ### script python pour généré transcript_to_gene dans Desktop/SNAKEMAKE/Salmon/scripts
-tx2gene <- read_tsv("transcript_to_gene.tsv")
+tx2gene <- read.table("~/Desktop/SNAKEMAKE_DEG/Salmon/transcript_to_gene.tsv")
 
-files <- file.path("Resultats", c("Col_1", "Col_2", "hon4_1","hon4_2","hon4_3"), "quant.sf")
+files <- file.path("DTE", c("Col_1", "Col_2", "hon4_1","hon4_2","hon4_3"), "quant.sf")
 names(files) <- c("Col_1", "Col_2", "hon4_1","hon4_2","hon4_3")
 
 txi <- tximport(files,type="salmon",tx2gene = tx2gene, txOut = TRUE)
 
 
 
-colnames(txi$counts)
+
 
 sampleTable <- data.frame(condition = factor(c(rep("Col",2), rep("hon4",3))))
 rownames(sampleTable) <- colnames(txi$counts)
@@ -106,14 +115,14 @@ dds <- DESeq(dds)
 
 rld <- rlog(dds, blind = FALSE)
 plotPCA(rld, intgroup="condition",ntop = 1000)
-res <- results(dds)
+res <- DESeq2::results(dds)
 
-genes_up = res[ which(res$padj < 0.11 & res$log2FoldChange > 1), ]
+genes_up = res[ which(res$padj < 0.10 & res$log2FoldChange > 1), ]
 
 genes_up <- genes_up[order(genes_up$padj, decreasing = F),]
 
 ## Gènes réprimés lorsque le gène testé est muté
-genes_down = res[ which(res$padj < 0.11 & res$log2FoldChange < -1), ]
+genes_down = res[ which(res$padj < 0.10 & res$log2FoldChange < -1), ]
 
 genes_down <- genes_down[order(genes_down$padj, decreasing = F),]
 
@@ -122,6 +131,16 @@ genes_up <- as.data.frame(genes_up)
 
 identifiants_genes_up <- rownames(genes_up)
 identifiants_genes_down <- rownames(genes_down)
+
+identifiants_genes_up <- gsub("[._][A-Za-z0-9]+", "",identifiants_genes_up)
+
+identifiants_genes_down <- gsub("[._][A-Za-z0-9]+", "",identifiants_genes_down)
+
+write.table(as.data.frame(unique(identifiants_genes_up),"~/Desktop/Data/DTE/transcripts_up.txt"))
+
+
+
+
 identifiants <- c(identifiants_genes_down,identifiants_genes_up)
 
 genes_up$ID <- identifiants_genes_up

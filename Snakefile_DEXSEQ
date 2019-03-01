@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import re
+import glob
+
+
+include: "config.py"
+
+
+RAWDATA_DIR = os.getcwd()
+
+FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
+
+
+if PAIRED_END:
+	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
+else:
+	SAMPLES = list(set([ x.rstrip(".fastq.gz") for x in FILES]))
+
+
+CONDITIONS = list(set(x.split("_")[0] for x in SAMPLES))
+
+CONDITION_TO_SAMPLES = {}
+
+for condition in CONDITIONS:
+	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.startswith(condition)]
+
+GENOME = "Reference/reference.fasta"
+GTF = "reference.gtf"
+
+
+rule all:	
+	input:
+		expand("DTE/{sample}/quant.sf", sample=SAMPLES)
+
+
+
+rule prepare_annotation_for_dexseq:
+    input: GTF
+    output: 'Reference/reference.DEXSeq.gff'
+    shell:
+        r'''source activate python2 && python /panfs/cmb-panasas2/skchoudh/software_frozen/anaconda27/envs/python2/lib/R/library/DEXSeq/python_scripts/dexseq_prepare_annotation.py {input} {output}
+        '''
