@@ -30,9 +30,9 @@ inDir = system.file("extdata", package="pasilla")
 
 countFiles = list.files(inDir, pattern="fb.txt$", full.names=TRUE)
 
-countFiles = list.files("Mapping", pattern=".bam$", full.names=TRUE)
+countFiles = list.files("DEU/Counts", pattern=".tsv$", full.names=TRUE)
 
-flattenedFile = list.files(inDir, pattern="gff$", full.names=TRUE)
+flattenedFile = list.files("Reference", pattern="reference.DEXSeq.gff", full.names=TRUE)
 
 flattenedFile
 
@@ -48,7 +48,7 @@ sampleTable = data.frame(
 
 sampleTable = data.frame(
   row.names = c("Col_1","Col_2","hon4_1","hon4_2","hon4_3"),
-  condition = c("Col","Col","hon4_1","hon4_2","hon4_3"),
+  condition = c("Col","Col","hon4","hon4","hon4"),
   libType = c("paired-end","paired-end","paired-end","paired-end","paired-end")
 )
 
@@ -56,7 +56,7 @@ sampleTable = data.frame(
 ## ----makeecs, eval=TRUE-------------------------------------------------------
 suppressPackageStartupMessages( library( "DEXSeq" ) )
 
-dxd = DEXSeqDataSetFromHTSeq(
+dxd = DEXSeqDataSetFromHTSeq (
   countFiles,
   sampleData=sampleTable,
   design= ~ sample + exon + condition:exon,
@@ -143,10 +143,10 @@ table( dxr2$padj < 0.1 )
 table( before = dxr1$padj < 0.1, now = dxr2$padj < 0.1 )
 
 ## ----plot1, fig.height=8, fig.width=12----------------------------------------
-plotDEXSeq( dxr2, "FBgn0010909", legend=TRUE, cex.axis=1.2, cex=1.3, lwd=2 )
+plotDEXSeq( dxr2, "AT1G01010", legend=TRUE, cex.axis=1.2, cex=1.3, lwd=2 )
 
 ## ----checkClaim,echo=FALSE----------------------------------------------------
-wh = (dxr2$groupID=="FBgn0010909")
+wh = (dxr2$groupID=="AT1G01010")
 stopifnot(sum(dxr2$padj[wh] < formals(plotDEXSeq)$FDR)==1)
 
 ## ----plot2, fig.height=8, fig.width=12----------------------------------------
@@ -154,15 +154,15 @@ plotDEXSeq( dxr2, "FBgn0010909", displayTranscripts=TRUE, legend=TRUE,
             cex.axis=1.2, cex=1.3, lwd=2 )
 
 ## ----plot3, fig.height=8, fig.width=12----------------------------------------
-plotDEXSeq( dxr2, "FBgn0010909", expression=FALSE, norCounts=TRUE,
+plotDEXSeq( dxr2, "AT1G01010", expression=FALSE, norCounts=TRUE,
             legend=TRUE, cex.axis=1.2, cex=1.3, lwd=2 )
 
 ## ----plot4, fig.height=8, fig.width=12----------------------------------------
-plotDEXSeq( dxr2, "FBgn0010909", expression=FALSE, splicing=TRUE,
+plotDEXSeq( dxr2, "AT1G01010", expression=FALSE, splicing=TRUE,
             legend=TRUE, cex.axis=1.2, cex=1.3, lwd=2 )
 
 ## ----DEXSeqHTML,cache=TRUE, eval=FALSE----------------------------------------
-#  DEXSeqHTML( dxr2, FDR=0.1, color=c("#FF000080", "#0000FF80") )
+DEXSeqHTML( dxr2, FDR=0.1, color=c("#FF000080", "#0000FF80") )
 
 ## ----para1,cache=TRUE,results='hide', eval=FALSE------------------------------
 #  BPPARAM = MultiCoreParam(workers=4)
