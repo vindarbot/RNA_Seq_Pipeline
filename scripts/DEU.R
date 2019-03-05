@@ -87,23 +87,25 @@ dxr1 = DEXSeqResults( dxd )
 
 
 genes_up <- dxr1[ which(dxr1$padj < 0.1 & dxr1$log2fold_hon4_Col > 0), ]
-genes_up <- genes_up[order(genes_up$padj, decreasing = F),]
 
 genes_down <- dxr1[ which(dxr1$padj < 0.1 & dxr1$log2fold_hon4_Col < 0), ]
-genes_down <- genes_down[order(genes_up$padj, decreasing = F),]
+
 
 
 genes_down <- as.data.frame(genes_down)
 genes_up <- as.data.frame(genes_up)
 
-genes_up <- genes_up[,c(1,6,7,10,15,16)]
-genes_down <- genes_down[,c(1,6,7,10,15,16)]
+genes_up <- genes_up[,c(1,6,7,10,15,16,24)]
+genes_down <- genes_down[,c(1,6,7,10,15,16,24)]
 
 identifiants_genes_up <- gsub(":[E][0-9]+$","",rownames(genes_up))
 identifiants_genes_down <- gsub(":[E][0-9]+$","",rownames(genes_down))
 
 genes_up$ID <- identifiants_genes_up
 genes_down$ID <- identifiants_genes_down
+
+genes_up <- genes_up[order(genes_up$padj, decreasing = F),]
+genes_down <- genes_down[order(genes_up$padj, decreasing = F),]
 
 ## Ensemble des gènes différentiellement exprimés.
 genes_signif = rbind(genes_up, genes_down)

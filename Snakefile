@@ -38,8 +38,8 @@ for path in DIRS:
 
 rule all:	
 	input:
-		counts = expand("DEU/counts/{sample}.counts.tsv", sample=SAMPLES),
-		salmon = expand("DTE/{sample}/quant.sf", sample=SAMPLES)
+		salmon = expand("DTE/{sample}/quant.sf", sample=SAMPLES),
+		counts = "DEG/genes_up.txt"
 
 
 
@@ -171,8 +171,11 @@ rule mapping_PE:
 
 	threads: 4
 
-	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --sjdbOverhang '+str(READ_LENGHT-1)+' --genomeDir {input.starref} \
-		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r1} {input.r2} --outSAMtype BAM SortedByCoordinate; \
+	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} \
+		--sjdbOverhang '+str(READ_LENGHT-1)+' --genomeDir {input.starref} \
+		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+		--readFilesCommand "gunzip -c" \
+		--outSAMtype BAM SortedByCoordinate; \
 		mv Mapping/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};\
 		mv Mapping/{wildcards.sample}*out* Mapping/Out'		
 
