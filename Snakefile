@@ -119,18 +119,18 @@ rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
 
 
 
-rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
-	input:
-		adapters = ADAPTERS,
-		r = 'Experience/{sample}.fastq.gz'
+# rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
+# 	input:
+# 		adapters = ADAPTERS,
+# 		r = 'Experience/{sample}.fastq.gz'
 
-	output:
-		r = 'Trimming/{sample}.trim.fastq.gz'
+# 	output:
+# 		r = 'Trimming/{sample}.trim.fastq.gz'
 
-	message: ''' --- Trimming  --- '''
+# 	message: ''' --- Trimming  --- '''
 
-	shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
-		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
+# 	shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
+# 		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
 
 
 
@@ -178,23 +178,23 @@ rule mapping_PE:
 
 
 
-rule mapping_SE:		
-	input:
-		gtf = GTF,
-		index = "Reference/star/chrName.txt",
-		starref = 'Reference/star/',
-		r = 'Trimming/{sample}.trim.fastq.gz'
+# rule mapping_SE:		
+# 	input:
+# 		gtf = GTF,
+# 		index = "Reference/star/chrName.txt",
+# 		starref = 'Reference/star/',
+# 		r = 'Trimming/{sample}.trim.fastq.gz'
 
-	output:
-		"Mapping/{sample}.bam"
+# 	output:
+# 		"Mapping/{sample}.bam"
 
-	message: ''' --- Alignement des lectures --- '''
+# 	message: ''' --- Alignement des lectures --- '''
 
-	threads: 6
+# 	threads: 6
 
-	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --genomeDir {input.starref} \
-		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r} --outSAMtype BAM SortedByCoordinate; \
-		mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
+# 	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --genomeDir {input.starref} \
+# 		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r} --outSAMtype BAM SortedByCoordinate; \
+# 		mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
 
 
 
