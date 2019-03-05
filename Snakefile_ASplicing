@@ -221,6 +221,8 @@ rule index_bam:
 
 	shell: ''' samtools index {input} > {output} '''
 
+	
+
 
 # rule rMATs_Con_Bas:
 #     input: 

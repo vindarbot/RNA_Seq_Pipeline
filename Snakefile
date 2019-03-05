@@ -38,7 +38,8 @@ for path in DIRS:
 
 rule all:	
 	input:
-		lala = expand("DEU/counts/{sample}.counts.tsv", sample=SAMPLES)
+		counts = expand("DEU/counts/{sample}.counts.tsv", sample=SAMPLES),
+		salmon = expand("DTE/{sample}/quant.sf", sample=SAMPLES)
 
 
 
@@ -296,7 +297,7 @@ rule salmonQuant:
 
 	params:
 		index = "Reference/Index_salmon",
-		boots = 30 
+		boots = 100 
 
 	threads: 8
 
@@ -307,7 +308,7 @@ rule salmonQuant:
 
 
 
-##### Analyse des exons différentiellement exprimés (DEXSEQ)
+#### Analyse des exons différentiellement exprimés (DEXSEQ)
 
 DEXSEQ_PATH = '/Library/Frameworks/R.framework/Versions/3.5/Resources/library/DEXSeq'
 

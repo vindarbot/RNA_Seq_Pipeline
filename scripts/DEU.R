@@ -5,46 +5,33 @@ library(GOstats)
 library(Category)
 library(org.At.tair.db)
 library(tidyverse)
-library(GenomicAlignments)
 library(biomaRt)
 library(ggplot2)
 library(DEXSeq)
 library(docopt)
-library(pasilla)
+
 
 
 
 dir = setwd("~/Desktop/Data")
 
-
 pythonScriptsDir = system.file( "python_scripts", package="DEXSeq" )
-list.files(pythonScriptsDir)
 
-head("/Library/Frameworks/R.framework/Versions/3.5/Resources/library/pasilla/extdata/treated3fb.txt")
+gene_description <- read.delim("~/Desktop/RNA_SEQ/gene_description_20131231.txt",
+                               header=FALSE, quote="")
+
 
 ## ----systemFileCheck,echo=FALSE,results='hide'--------------------------------
 system.file( "python_scripts", package="DEXSeq", mustWork=TRUE )
 
 ## ----loadDEXSeq---------------------------------------------------------------
-inDir = system.file("extdata", package="pasilla")
-
-countFiles = list.files(inDir, pattern="fb.txt$", full.names=TRUE)
 
 countFiles = list.files("DEU/Counts", pattern=".tsv$", full.names=TRUE)
 
 flattenedFile = list.files("Reference", pattern="reference.DEXSeq.gff", full.names=TRUE)
 
-flattenedFile
 
 ## ----sampleTable--------------------------------------------------------------
-sampleTable = data.frame(
-  row.names = c( "treated1", "treated2", "treated3", 
-                 "untreated1", "untreated2", "untreated3", "untreated4" ),
-  condition = c("knockdown", "knockdown", "knockdown",  
-                "control", "control", "control", "control" ),
-  libType = c( "single-end", "paired-end", "paired-end", 
-               "single-end", "single-end", "paired-end", "paired-end" ) )
-
 
 sampleTable = data.frame(
   row.names = c("Col_1","Col_2","hon4_1","hon4_2","hon4_3"),
@@ -54,7 +41,6 @@ sampleTable = data.frame(
 
 
 ## ----makeecs, eval=TRUE-------------------------------------------------------
-suppressPackageStartupMessages( library( "DEXSeq" ) )
 
 dxd = DEXSeqDataSetFromHTSeq (
   countFiles,
@@ -62,12 +48,6 @@ dxd = DEXSeqDataSetFromHTSeq (
   design= ~ sample + exon + condition:exon,
   flattenedfile=flattenedFile )
 
-## ----start--------------------------------------------------------------------
-genesForSubset = read.table( 
-  file.path(inDir, "geneIDsinsubset.txt"), 
-  stringsAsFactors=FALSE)[[1]]
-
-dxd = dxd[geneIDs( dxd ) %in% genesForSubset,]
 
 ## ----seeColData---------------------------------------------------------------
 colData(dxd)
@@ -104,7 +84,102 @@ dxd = estimateExonFoldChanges( dxd, fitExpToVar="condition")
 
 ## ----results1,cache=TRUE------------------------------------------------------
 dxr1 = DEXSeqResults( dxd )
-dxr1
+
+
+genes_up <- dxr1[ which(dxr1$padj < 0.1 & dxr1$log2fold_hon4_Col > 0), ]
+genes_up <- genes_up[order(genes_up$padj, decreasing = F),]
+
+genes_down <- dxr1[ which(dxr1$padj < 0.1 & dxr1$log2fold_hon4_Col < 0), ]
+genes_down <- genes_down[order(genes_up$padj, decreasing = F),]
+
+
+genes_down <- as.data.frame(genes_down)
+genes_up <- as.data.frame(genes_up)
+
+genes_up <- genes_up[,c(1,6,7,10,15,16)]
+genes_down <- genes_down[,c(1,6,7,10,15,16)]
+
+identifiants_genes_up <- gsub(":[E][0-9]+$","",rownames(genes_up))
+identifiants_genes_down <- gsub(":[E][0-9]+$","",rownames(genes_down))
+
+genes_up$ID <- identifiants_genes_up
+genes_down$ID <- identifiants_genes_down
+
+## Ensemble des gènes différentiellement exprimés.
+genes_signif = rbind(genes_up, genes_down)
+
+## Le fichier gene_description a été récupéré sur TAIR10 et nous permet d'accéder aux annotations
+# des gènes, à partir de leur identifiants.
+
+
+genenames = gsub("[.][1234567890]", "",
+                 gene_description[,1])
+
+gene_description[,1]=genenames
+
+## Ici on récupère la description des gènes différentiellement exprimés
+genes_match_rows <- match(genes_signif$groupID, gene_description[,1])
+
+genes_match_up <- match((genes_up$groupID), gene_description[,1])
+
+Code_to_description <- gene_description[genes_match_rows,c(1,3)]
+
+Code_to_description_up <- gene_description[genes_match_up,c(1,3)]
+
+
+colnames(Code_to_description) <- c("Code","Description")
+
+colnames(Code_to_description_up) <- c("Code","Description")
+
+
+genes_match_down <- match((genes_down$groupID), gene_description[,1])
+
+Code_to_description_down <- gene_description[genes_match_down,c(1,3)]
+
+colnames(Code_to_description_down) <- c("Code","Description")
+
+
+genes_up$Description <- Code_to_description_up$Description
+
+genes_down$Description <- Code_to_description_down$Description
+
+
+
+ensembl <- useMart(biomart="plants_mart",host="plants.ensembl.org",dataset = "athaliana_eg_gene")
+
+TAIRID <- genes_down$ID
+
+symbol <- getBM(attributes=c("tair_symbol","tair_locus"), mart=ensembl)
+
+genes_up <- (merge(x=symbol,y=genes_up,by.x="tair_locus",by.y="ID"))
+
+genes_down <- (merge(x=symbol,y=genes_down,by.x="tair_locus",by.y="ID"))
+
+
+write_tsv(as.data.frame(genes_up),"DEU/genes_up_DEXSEQ.txt")
+write_tsv(as.data.frame(genes_down),"DEU/genes_down_DEXSEQ.txt")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## ----results2,cache=TRUE------------------------------------------------------
 elementMetadata(dxr1)$description
@@ -116,7 +191,7 @@ table ( dxr1$padj < 0.1 )
 table ( tapply( dxr1$padj < 0.1, dxr1$groupID, any ) )
 
 ## ----MvsA, dev='png', resolution=200------------------------------------------
-plotMA( dxr1, cex=0.8 )
+plotMA( dxr1)
 
 ## ----design-------------------------------------------------------------------
 sampleAnnotation(dxd)
@@ -143,18 +218,18 @@ table( dxr2$padj < 0.1 )
 table( before = dxr1$padj < 0.1, now = dxr2$padj < 0.1 )
 
 ## ----plot1, fig.height=8, fig.width=12----------------------------------------
-plotDEXSeq( dxr2, "AT1G01010", legend=TRUE, cex.axis=1.2, cex=1.3, lwd=2 )
+plotDEXSeq( dxr1, "AT1G64790", legend=TRUE, cex.axis=1.2, cex=1.3, lwd=2 )
 
 ## ----checkClaim,echo=FALSE----------------------------------------------------
-wh = (dxr2$groupID=="AT1G01010")
+wh = (dxr2$groupID=="AT1G64790")
 stopifnot(sum(dxr2$padj[wh] < formals(plotDEXSeq)$FDR)==1)
 
 ## ----plot2, fig.height=8, fig.width=12----------------------------------------
-plotDEXSeq( dxr2, "FBgn0010909", displayTranscripts=TRUE, legend=TRUE,
+plotDEXSeq( dxr1, "AT1G64790", displayTranscripts=TRUE, legend=TRUE,
             cex.axis=1.2, cex=1.3, lwd=2 )
 
 ## ----plot3, fig.height=8, fig.width=12----------------------------------------
-plotDEXSeq( dxr2, "AT1G01010", expression=FALSE, norCounts=TRUE,
+plotDEXSeq( dxr2, "AT1G64790", expression=FALSE, norCounts=TRUE,
             legend=TRUE, cex.axis=1.2, cex=1.3, lwd=2 )
 
 ## ----plot4, fig.height=8, fig.width=12----------------------------------------
