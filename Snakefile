@@ -161,7 +161,7 @@ rule mapping_PE:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
 		starref = 'Reference/star/',
-		r1 = 'Trimming/{sample}_R1.trim.fastq.gz,
+		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
 		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
 	output:
@@ -308,38 +308,38 @@ rule salmonQuant:
 
 
 
-#### Analyse des exons différentiellement exprimés (DEXSEQ)
+# #### Analyse des exons différentiellement exprimés (DEXSEQ)
 
-DEXSEQ_PATH = '/Library/Frameworks/R.framework/Versions/3.5/Resources/library/DEXSeq'
+# DEXSEQ_PATH = '/Library/Frameworks/R.framework/Versions/3.5/Resources/library/DEXSeq'
 
-rule prepare_annotation_for_dexseq:
-    input: GTF
+# rule prepare_annotation_for_dexseq:
+#     input: GTF
 
-    output: 
-    	'Reference/reference.DEXSeq.gff'
+#     output: 
+#     	'Reference/reference.DEXSeq.gff'
 
-    params:
-    	dexseq_path = DEXSEQ_PATH
+#     params:
+#     	dexseq_path = DEXSEQ_PATH
 
-    message: ''' Création du fichier GFF (nécessaire à DEXSEQ) '''
+#     message: ''' Création du fichier GFF (nécessaire à DEXSEQ) '''
 
-    shell:'''python2 {params.dexseq_path}/python_scripts/dexseq_prepare_annotation.py {input} {output} 
-        '''
+#     shell:'''python2 {params.dexseq_path}/python_scripts/dexseq_prepare_annotation.py {input} {output} 
+#         '''
 
 
 
-rule deseq_count:
-	input: 
- 		'Reference/reference.DEXSeq.gff'
+# rule deseq_count:
+# 	input: 
+#  		'Reference/reference.DEXSeq.gff'
 
-	output: 
-    	expand('DEU/counts/{sample}.counts.tsv', sample=SAMPLES)
+# 	output: 
+#     	expand('DEU/counts/{sample}.counts.tsv', sample=SAMPLES)
 
-	params:
-    	dexseq_path = DEXSEQ_PATH
+# 	params:
+#     	dexseq_path = DEXSEQ_PATH
 
-	shell:''' python2 {params.dexseq_path}/python_scripts/dexseq_count.py -p yes -s yes -r pos -f sam {input} <(samtools view -O SAM Mapping/{wildcards.sample}.sorted.bam) {output}
-        '''
+# 	shell:''' python2 {params.dexseq_path}/python_scripts/dexseq_count.py -p yes -s yes -r pos -f sam {input} <(samtools view -O SAM Mapping/{wildcards.sample}.sorted.bam) {output}
+#         '''
 
 
 
