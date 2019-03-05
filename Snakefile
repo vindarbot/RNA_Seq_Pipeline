@@ -108,13 +108,13 @@ rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
 		r2 = 'Experience/{sample}_R2.fastq.gz'
 
 	output:
-		r1 = 'Trimming/{sample}_R1.trim.fastq',
-		r2 = 'Trimming/{sample}_R2.trim.fastq'
+		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
 	message: ''' --- Trimming  --- '''
 
 	shell: ' bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
-		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo '
+		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
 
 
 
@@ -125,12 +125,12 @@ rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
 		r = 'Experience/{sample}.fastq.gz'
 
 	output:
-		r = 'Trimming/{sample}.trim.fastq'
+		r = 'Trimming/{sample}.trim.fastq.gz'
 
 	message: ''' --- Trimming  --- '''
 
 	shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
-		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo '
+		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
 
 
 
@@ -161,8 +161,8 @@ rule mapping_PE:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
 		starref = 'Reference/star/',
-		r1 = 'Trimming/{sample}_R1.trim.fastq',
-		r2 = 'Trimming/{sample}_R2.trim.fastq'
+		r1 = 'Trimming/{sample}_R1.trim.fastq.gz,
+		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
 	output:
 		"Mapping/{sample}.bam"
@@ -183,7 +183,7 @@ rule mapping_SE:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
 		starref = 'Reference/star/',
-		r = 'Trimming/{sample}.trim.fastq'
+		r = 'Trimming/{sample}.trim.fastq.gz'
 
 	output:
 		"Mapping/{sample}.bam"
@@ -288,8 +288,8 @@ rule DESeq2:
 rule salmonQuant:
 	input:
 		transcriptome = TRANSCRIPTOME,
-		r1 = 'Trimming/{sample}_R1.trim.fastq',
-		r2 = 'Trimming/{sample}_R2.trim.fastq'
+		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
 
 	output:
@@ -297,7 +297,7 @@ rule salmonQuant:
 
 	params:
 		index = "Reference/Index_salmon",
-		boots = 100 
+		boots = 30 
 
 	threads: 8
 
