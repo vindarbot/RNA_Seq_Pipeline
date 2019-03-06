@@ -2,7 +2,7 @@ BiocManager::install("IsoformSwitchAnalyzeR")
 
 library(IsoformSwitchAnalyzeR)
 library(tximport)
-
+library(ggplot2)
 
 dir = setwd("~/Desktop/Data")
 
@@ -18,27 +18,24 @@ Design <- data.frame(
   condition = gsub('_.*', '', colnames(salmonQuant$abundance)[-1])
 )
 
-importGTF(
-  
-)
 
 aSwitchList <- importRdata(
   isoformCountMatrix   = salmonQuant$counts,
   isoformRepExpression = salmonQuant$abundance,
   designMatrix         = Design,
   isoformExonAnnoation = c("Reference/reference_AtRTDv2.gtf"),
-  isoformNtFasta = c("Reference/transcriptome.fasta"),
+  isoformNtFasta = c("Reference/reference_AtRTDv2.fasta"),
   addAnnotatedORFs=TRUE,
   showProgress = FALSE
 )
-?importRdata()
+
 # Removal of single isoform genes is the default setting in preFilter() since these genes, per definition, cannot have changes in isoform usage
 
 preFilter(aSwitchList, geneExpressionCutoff = 5)
 
 exampleSwitchListAnalyzed <- isoformSwitchTestDEXSeq(
   switchAnalyzeRlist = aSwitchList,
-  reduceToSwitchingGenes=TRUE
+  reduceToSwitchingGenes=FALSE
 )
 
 exampleSwitchListAnalyzed <- analyzeAlternativeSplicing(exampleSwitchListAnalyzed, quiet=TRUE)
@@ -69,5 +66,10 @@ analyzeORF(
   quiet=FALSE
 )
 
-exampleSwitchListAnalyzed$isoformRepExpression
+
+
+extract( exampleSwitchListAnalyzed )
+
+
+analyzeSwitchConsequences(exampleSwitchListAnalyzed)
 

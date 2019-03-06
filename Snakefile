@@ -39,7 +39,8 @@ for path in DIRS:
 rule all:	
 	input:
 		salmon = expand("DTE/{sample}/quant.sf", sample=SAMPLES),
-		counts = "DEG/genes_up.txt"
+		counts = "DEG/genes_up.txt",
+		index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
 
 
 
@@ -216,10 +217,10 @@ rule sort_bam:
 
 rule index_bam:
 	input:
-		expand("Mapping/{sample}.sorted.bam", sample=SAMPLES)
+		"Mapping/{sample}.sorted.bam"
 
 	output:
-		expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
+		"Mapping/{sample}.sorted.bam.bai"
 
 	shell: ''' samtools index {input} > {output} '''
 
