@@ -38,9 +38,7 @@ for path in DIRS:
 
 rule all:	
 	input:
-		salmon = expand("DTE/{sample}/quant.sf", sample=SAMPLES),
-		counts = "DEG/genes_up.txt",
-		index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
+		output = "DEG/genes_down.txt"
 
 
 
@@ -72,7 +70,7 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 	output:
 		fasta = "Reference/reference.fasta",
 		gtf = "Reference/reference.gtf",
-		transcripto = "transcriptome.fasta",
+		transcripto = "Reference/transcriptome.fasta",
 		description = "description.txt"
 
 	params:

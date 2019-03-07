@@ -65,6 +65,8 @@ dds <- DESeq(dds)
 
 dds <- estimateSizeFactors(dds)
 
+dds = estimateDispersions( dds )
+
 rld <- rlog(dds, blind = FALSE)
 
 
@@ -144,17 +146,17 @@ TAIRID <- genes_down$ID
 
 symbol <- getBM(attributes=c("tair_symbol","tair_locus"), mart=ensembl)
 
-genes_up <- (merge(x=symbol,y=genes_up,by.x="tair_locus",by.y="ID"))
+genes_up <- (merge(x=symbol,y=genes_up,by.x="tair_locus",by.y="ID",all.y=TRUE))
 genes_up <- genes_up[c(1,2,4,8,9)]
 genes_up <- genes_up[order(genes_up$padj,decreasing = F),]
 
-genes_down <- (merge(x=symbol,y=genes_down,by.x="tair_locus",by.y="ID"))
+genes_down <- (merge(x=symbol,y=genes_down,by.x="tair_locus",by.y="ID",all.y=TRUE))
 genes_down <- genes_down[c(1,2,4,8,9)]
 genes_down <- genes_down[order(genes_down$padj,decreasing = F),]
 
 
-write_tsv(as.data.frame(genes_up),"DEG/genes_up.txt")
-write_tsv(as.data.frame(genes_down),"DEG/genes_down.txt")
+write_tsv(as.data.frame(genes_up),outprefix+"genes_up.txt")
+write_tsv(as.data.frame(genes_down),outprefix+"genes_down.txt")
 
 
 
