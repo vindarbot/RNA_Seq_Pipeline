@@ -40,6 +40,7 @@ featurescounts=read.csv("featureCounts/counts.txt", sep="", head=T, skip=1, row.
 featureMatrix <- featurescounts[ ,6:ncol(featurescounts)]
   
 colnames(featureMatrix) <- gsub("Mapping.", "", colnames(featureMatrix))
+colnames(featureMatrix) <- gsub(".sorted.bam","",colnames(featureMatrix))
 
 featureMatrix <- as.matrix(featureMatrix)
 
