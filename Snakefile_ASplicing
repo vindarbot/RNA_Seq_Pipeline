@@ -34,18 +34,19 @@ BAS_SAMPLES = list(filter(lambda x: 'Basal' in x, SAMPLES))
 
 
 
-DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','rMATS']
+# DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','rMATS']
 
-for path in DIRS:
-	if not os.path.exists(path):
-		os.mkdir(path)
+# for path in DIRS:
+# 	if not os.path.exists(path):
+# 		os.mkdir(path)
 
 
 
 rule all:	
 	input:
-		expand("Mapping/{sample}.bam.bai", sample=SAMPLES),
-		expand("Mapping/{sample}.bam", sample=SAMPLES)
+		xpDesign = "experimentalDesign.txt",
+		trimming = expand('Trimming/{sample}_R1.trim.fastq', sample=SAMPLES)
+#		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
 
@@ -118,7 +119,7 @@ if PAIRED_END:
 
 		message: ''' --- Trimming  --- '''
 
-		shell: ' cutadapt -u {params.cut_trim} -U {params.cut_trim} -o {output.r1} -p {output.r2} {input.r1} {input.r2} '
+		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output.r1} -p {output.r2} {input.r1} {input.r2} -j 8 --pair-filter=any '
 
 
 else:
@@ -134,116 +135,116 @@ else:
 
 		message: ''' --- Trimming  --- '''
 
-		shell: ' cutadapt -u {params.cut_trim} -o {output} {input} '
+		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} '
 
 
-GENOME = "Reference/reference.fasta"
-GTF = "reference.gtf"
+# GENOME = "Reference/reference.fasta"
+# GTF = "reference.gtf"
 
 
-rule indexation_genome:		# Indexation du génome de référence 
-	input:
-		genome = GENOME,
-		gtf = GTF,
-		starref = 'Reference/star/'
+# rule indexation_genome:		# Indexation du génome de référence 
+# 	input:
+# 		genome = GENOME,
+# 		gtf = GTF,
+# 		starref = 'Reference/star/'
 
-	output:
-		"Reference/star/chrName.txt"
+# 	output:
+# 		"Reference/star/chrName.txt"
 
-	threads: 8
+# 	threads: 8
 
-	message: ''' --- Indexation du génome de référence --- '''
+# 	message: ''' --- Indexation du génome de référence --- '''
 
-	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate  \
-	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
+# 	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate  \
+# 	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
 
 
-if PAIRED_END:
-	rule mapping_PE:		
-		input:
-			gtf = GTF,
-			index = "Reference/star/chrName.txt",
-			starref = 'Reference/star/',
-			r1 = 'Trimming/{sample}_R1.trim.fastq',
-			r2 = 'Trimming/{sample}_R2.trim.fastq'
+# if PAIRED_END:
+# 	rule mapping_PE:		
+# 		input:
+# 			gtf = GTF,
+# 			index = "Reference/star/chrName.txt",
+# 			starref = 'Reference/star/',
+# 			r1 = 'Trimming/{sample}_R1.trim.fastq',
+# 			r2 = 'Trimming/{sample}_R2.trim.fastq'
 
-		output:
-			"Mapping/{sample}.bam"
+# 		output:
+# 			"Mapping/{sample}.bam"
 
-		message: ''' --- Alignement des lectures --- '''
+# 		message: ''' --- Alignement des lectures --- '''
 
-		threads: 6
+# 		threads: 6
 
-		shell: ' STAR --runThreadN {threads} \
-		--sjdbGTFfile {input.gtf} --sjdbOverhang 100 \
-		--genomeDir {input.starref} \
-		--outFileNamePrefix Mapping/{wildcards.sample} \
-		--readFilesIn {input.r1} {input.r2} \
-		--alignEndsType EndToEnd \
-		--outSAMtype BAM SortedByCoordinate; \
-		mv Mapping/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};\
-		mv Mapping/{wildcards.sample}*out* Mapping/Out'		
+# 		shell: ' STAR --runThreadN {threads} \
+# 		--sjdbGTFfile {input.gtf} --sjdbOverhang 100 \
+# 		--genomeDir {input.starref} \
+# 		--outFileNamePrefix Mapping/{wildcards.sample} \
+# 		--readFilesIn {input.r1} {input.r2} \
+# 		--alignEndsType EndToEnd \
+# 		--outSAMtype BAM SortedByCoordinate; \
+# 		mv Mapping/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};\
+# 		mv Mapping/{wildcards.sample}*out* Mapping/Out'		
 		
 
-else:
-	rule mapping_SE:		
-		input:
-			gtf = GTF,
-			index = "Reference/star/chrName.txt",
-			starref = 'Reference/star/',
-			r = 'Trimming/{sample}.trim.fastq'
+# else:
+# 	rule mapping_SE:		
+# 		input:
+# 			gtf = GTF,
+# 			index = "Reference/star/chrName.txt",
+# 			starref = 'Reference/star/',
+# 			r = 'Trimming/{sample}.trim.fastq'
 
-		output:
-			"Mapping/{sample}.bam"
+# 		output:
+# 			"Mapping/{sample}.bam"
 
-		message: ''' --- Alignement des lectures --- '''
+# 		message: ''' --- Alignement des lectures --- '''
 
-		threads: 6
+# 		threads: 6
 
-		shell: ' STAR --runThreadN {threads} \
-		--sjdbGTFfile {input.gtf} \
-		--genomeDir {input.starref} \
-		--outFileNamePrefix Mapping/{wildcards.sample} \
-		--readFilesIn {input.r} \
-		--alignEndsType EndToEnd \
-		--outSAMtype BAM SortedByCoordinate; \
-		mv Mapping/{sample}Aligned.sortedByCoord.out.bam {output};\
-		mv Mapping/{sample}*out* Mapping/Out'
+# 		shell: ' STAR --runThreadN {threads} \
+# 		--sjdbGTFfile {input.gtf} \
+# 		--genomeDir {input.starref} \
+# 		--outFileNamePrefix Mapping/{wildcards.sample} \
+# 		--readFilesIn {input.r} \
+# 		--alignEndsType EndToEnd \
+# 		--outSAMtype BAM SortedByCoordinate; \
+# 		mv Mapping/{sample}Aligned.sortedByCoord.out.bam {output};\
+# 		mv Mapping/{sample}*out* Mapping/Out'
 
 
 
-rule index_bam:
-	input:
-		"Mapping/{sample}.bam"
+# rule index_bam:
+# 	input:
+# 		"Mapping/{sample}.bam"
 
-	output:
-		"Mapping/{sample}.bam.bai"
+# 	output:
+# 		"Mapping/{sample}.bam.bai"
 
-	shell: ''' samtools index {input} > {output} '''
+# 	shell: ''' samtools index {input} > {output} '''
 
 	
 
 
-# rule rMATs_Con_Bas:
-#     input: 
-#         Con= expand('Mapping/{sample}.bam', sample=CON_SAMPLES),
-#         Bas = expand('Mapping/{sample}.bam', sample=BAS_SAMPLES)
-#     params:
-#         outdir = 'rMATS'
+# # rule rMATs_Con_Bas:
+# #     input: 
+# #         Con= expand('Mapping/{sample}.bam', sample=CON_SAMPLES),
+# #         Bas = expand('Mapping/{sample}.bam', sample=BAS_SAMPLES)
+# #     params:
+# #         outdir = 'rMATS'
 
-#     output: 'alternative_splicing_rMATS/All_T1_vs_T0/MATS_output/AS_Event.MATS.JunctionCountOnly.txt'
+# #     output: 'alternative_splicing_rMATS/All_T1_vs_T0/MATS_output/AS_Event.MATS.JunctionCountOnly.txt'
 
-#     run:
-#         b1 = ','.join(input.Con),
-#         b2 = ','.join(input.Bas)
-#         gtf = GTF
-#         star_index = STAR_INDEX
+# #     run:
+# #         b1 = ','.join(input.Con),
+# #         b2 = ','.join(input.Bas)
+# #         gtf = GTF
+# #         star_index = STAR_INDEX
 
-#         shell(r'''python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py \
-#         	-b1 {b1} -b2 {b2} -len 87 -t single -gtf {gtf} \
-#         	-bi {star_index} -o {params.outdir} 1>&2''')
-
-
-nohup python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py --b1 b1.txt --b2 b2.txt --readLength 139 -t paired --gtf reference.gtf --bi Reference/star/ --od rMATS &
+# #         shell(r'''python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py \
+# #         	-b1 {b1} -b2 {b2} -len 87 -t single -gtf {gtf} \
+# #         	-bi {star_index} -o {params.outdir} 1>&2''')
 
 
+# #nohup python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py --b1 b1.txt --b2 b2.txt --readLength 139 -t paired --gtf reference.gtf --bi Reference/star/ --od rMATS &
+
+# # python2.7 /Users/vindarbo/happy_bin/rMATS.4.0.1/rMATS-turbo-Mac-UCS2/rmats.py --b1 b1.txt --b2 b2.txt --readLength 150 -t paired --gtf Reference/reference.gtf --bi Reference/star/ --od rMATS_HS/ &

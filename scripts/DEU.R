@@ -90,7 +90,7 @@ genes_up <- dxr1[ which(dxr1$padj < 0.1 & dxr1$log2fold_hon4_Col > 0), ]
 
 genes_down <- dxr1[ which(dxr1$padj < 0.1 & dxr1$log2fold_hon4_Col < 0), ]
 
-
+dxr1[which(dxr1$groupID=="AT2G38460"),]
 
 genes_down <- as.data.frame(genes_down)
 genes_up <- as.data.frame(genes_up)
@@ -220,7 +220,7 @@ table( dxr2$padj < 0.1 )
 table( before = dxr1$padj < 0.1, now = dxr2$padj < 0.1 )
 
 ## ----plot1, fig.height=8, fig.width=12----------------------------------------
-plotDEXSeq( dxr1, "AT1G64790", legend=TRUE, cex.axis=1.2, cex=1.3, lwd=2 )
+plotDEXSeq( dxr1, "AT3G18035", legend=TRUE, cex.axis=1.2, cex=1.3, lwd=2 )
 
 ## ----checkClaim,echo=FALSE----------------------------------------------------
 wh = (dxr2$groupID=="AT1G64790")

@@ -17,7 +17,7 @@ import re
 import subprocess
 import glob
 from collections import defaultdict
-
+from decimal import *
 
 featureCounts = open(sys.argv[1],"r")
 
@@ -61,8 +61,12 @@ with open("RPKM.txt", "w") as RPKM:
 		RPKM.write(ligne.rstrip().split()[0]+"\t")
 		for sample in range(len(ligne.rstrip().split()[6:])):
 
+
+			RPKM_value = int(ligne.rstrip().split()[6:][sample]) / ((int(ligne.rstrip().split()[5]) / 1000) * (int(sample_to_total_reads[sample])) / 1e6 )
+			RPKM_value = round(RPKM_value,2)
+
 			#        RPKM = nombre de reads compté pour un échantillon    longueur du gène (6ème colonne du fichier) / 1000       nombre total de reads de l'échantillon / 1e6
-			RPKM.write(str(int(ligne.rstrip().split()[6:][sample]) / ((int(ligne.rstrip().split()[5]) / 1000) * (int(sample_to_total_reads[sample])) / 1e6 ))+"\t")
+			RPKM.write(str(RPKM_value)+"\t")
 		RPKM.write("\n")
 
 

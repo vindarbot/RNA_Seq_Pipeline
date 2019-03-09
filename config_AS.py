@@ -28,8 +28,9 @@ GET_DESCRIPTION = "https://www.arabidopsis.org/download_files/Genes/TAIR10_genom
 TRIMMING =		True
 
 
-# rMATS demande en entrée une longeur de reads spécifique, on trim donc tous les reads de 13bp en 3' (même les reads n'ayant pas d'adaptapteurs)
-CUT_TRIM   =		13
+# rMATS demande en entrée une longeur de reads spécifique, on supprime donc 36bp en 3' pour tous les reads (même les reads n'ayant pas d'adaptapteurs)
+# 151-36 = 115pb (longueur de reads à indiquer à cutadapt)
+CUT_TRIM   =		115
 
 READ_LENGHT_TRIM = READ_LENGHT-CUT_TRIM
 
