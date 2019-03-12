@@ -322,7 +322,7 @@ rule firstPass:
 
 	threads: 4
 
-	shell:' STAR --runThreadN {threads} --genomeDir pass1/Ref Alignement/GenReference --sjdbGTFfile {input.gtf} \
+	shell:' STAR --runThreadN {threads} --genomeDir Reference/star --sjdbGTFfile {input.gtf} \
 		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
 		--readFilesCommand "gunzip -c" --twopassMode Basic\
 		--outSAMtype BAM SortedByCoordinate; \
