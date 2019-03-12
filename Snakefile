@@ -324,7 +324,7 @@ rule firstPass:
 
 	shell:' STAR --runThreadN {threads} --genomeDir pass1/Ref --sjdbGTFfile {input.gtf} \
 		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
-		--readFilesCommand "gunzip -c" --twopassMode Basic\
+		--readFilesCommand "gunzip -c" \
 		--outSAMtype BAM SortedByCoordinate; \
 		mv pass1/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
