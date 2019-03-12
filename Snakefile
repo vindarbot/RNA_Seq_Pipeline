@@ -38,7 +38,7 @@ for path in DIRS:
 
 rule all:	
 	input:
-		output = "DEG/genes_down.txt"
+		output = expand("pass1/{sample}.bam", sample=SAMPLES)
 
 
 
@@ -310,44 +310,23 @@ rule salmonQuant:
 
 
 
-# #### Analyse des exons différentiellement exprimés (DEXSEQ)
+rule firstPass:
+	input:
+		gtf = GTF,
+		genome = GENOME,
+		r1 = 'TrimmingHS/{sample}_R1.trim.adapt.fastq.gz',
+		r2 = 'TrimmingHS/{sample}_R2.trim.adapt.fastq.gz'
 
-# DEXSEQ_PATH = '/Library/Frameworks/R.framework/Versions/3.5/Resources/library/DEXSeq'
+	output:
+		"pass1/{sample}.bam"
 
-# rule prepare_annotation_for_dexseq:
-#     input: GTF
+	threads: 4
 
-#     output: 
-#     	'Reference/reference.DEXSeq.gff'
-
-#     params:
-#     	dexseq_path = DEXSEQ_PATH
-
-#     message: ''' Création du fichier GFF (nécessaire à DEXSEQ) '''
-
-#     shell:'''python2 {params.dexseq_path}/python_scripts/dexseq_prepare_annotation.py {input} {output} 
-#         '''
-
-
-
-# rule deseq_count:
-# 	input: 
-#  		'Reference/reference.DEXSeq.gff'
-
-# 	output: 
-#     	expand('DEU/counts/{sample}.counts.tsv', sample=SAMPLES)
-
-# 	params:
-#     	dexseq_path = DEXSEQ_PATH
-
-# 	shell:''' python2 {params.dexseq_path}/python_scripts/dexseq_count.py -p yes -s yes -r pos -f sam {input} <(samtools view -O SAM Mapping/{wildcards.sample}.sorted.bam) {output}
-#         '''
-
-
-
-
-
-
+	shell:' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} \
+		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+		--readFilesCommand "gunzip -c" \
+		--outSAMtype BAM SortedByCoordinate; \
+		mv pass1/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
 

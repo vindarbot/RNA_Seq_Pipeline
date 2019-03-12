@@ -30,6 +30,7 @@ description <- opts[['description']]
 
 
 xpdesign = read.csv(xpdesign, row.names=1, sep=",")
+rownames(xpdesign) <- gsub(".sorted.bam","",rownames(xpdesign))
 
 featurescounts=read.csv("featureCounts/counts.txt", sep="", head=T, skip=1, row.names = "Geneid")
 
