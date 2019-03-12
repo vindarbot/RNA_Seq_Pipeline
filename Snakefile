@@ -329,6 +329,25 @@ rule firstPass:
 		mv pass1/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
+awk 'BEGIN {OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";} {if($5>0){print $1,$2,$3,strChar[$4]}}' Alignement/*pass1/SJ.out.tab > Alignement/SJ.out.tab.Pass1.sjdb
+
+
+rule generateGenome:
+	
+
+
+
+	shell: ''' 
+
+
+	mkdir Alignement/GenReferenceForPass2
+
+	mkdir Alignement/Pass2
+
+	STAR --genomeDir Alignement/GenReferenceForPass2 --runMode genomeGenerate --genomeFastaFiles ../TAIR10.fasta \
+	--sjdbFileChrStartEnd Alignement/SJ.out.tab.Pass1.sjdb --sjdbOverhang 100 --runThreadN 12
+
+}
 
 
 
