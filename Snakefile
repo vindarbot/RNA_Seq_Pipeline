@@ -329,25 +329,45 @@ rule firstPass:
 		mv pass1/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
-awk 'BEGIN {OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";} {if($5>0){print $1,$2,$3,strChar[$4]}}' Alignement/*pass1/SJ.out.tab > Alignement/SJ.out.tab.Pass1.sjdb
+# awk 'BEGIN {OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";} {if($5>0){print $1,$2,$3,strChar[$4]}}' Alignement/*pass1/SJ.out.tab > Alignement/SJ.out.tab.Pass1.sjdb
 
 
-rule generateGenome:
+# rule generateGenome:
 	
 
 
 
-	shell: ''' 
+# 	shell: ''' 
 
 
-	mkdir Alignement/GenReferenceForPass2
+# 	mkdir Alignement/GenReferenceForPass2
 
-	mkdir Alignement/Pass2
+# 	mkdir Alignement/Pass2
 
-	STAR --genomeDir Alignement/GenReferenceForPass2 --runMode genomeGenerate --genomeFastaFiles ../TAIR10.fasta \
-	--sjdbFileChrStartEnd Alignement/SJ.out.tab.Pass1.sjdb --sjdbOverhang 100 --runThreadN 12
+# 	STAR --genomeDir Alignement/GenReferenceForPass2 --runMode genomeGenerate --genomeFastaFiles ../TAIR10.fasta \
+# 	--sjdbFileChrStartEnd Alignement/SJ.out.tab.Pass1.sjdb --sjdbOverhang 100 --runThreadN 12
 
-}
+# }
+
+
+rule secondPass:
+	input:
+		gtf = GTF,
+		genome = GENOME,
+		r1 = 'TrimmingHS/{sample}_R1.trim.adapt.fastq.gz',
+		r2 = 'TrimmingHS/{sample}_R2.trim.adapt.fastq.gz'
+
+		output:
+		"pass2/{sample}.bam"
+
+		threads: 4
+
+		shell:' STAR --runThreadN {threads} --genomeDir genomeForPass2 --sjdbGTFfile {input.gtf} \
+		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+		--alignEndsType EndToEnd --sjdbOverhang 114 --readFilesCommand "gunzip -c" \
+		--outSAMtype BAM SortedByCoordinate; \
+		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
+
 
 
 

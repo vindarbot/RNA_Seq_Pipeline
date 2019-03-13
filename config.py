@@ -12,7 +12,7 @@
 
 PAIRED_END = True
 
-READ_LENGHT = 	150
+READ_LENGHT = 	115
 
 GET_GENOME	=	"https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_chromosome_files/TAIR10_chr_all.fas"
 
