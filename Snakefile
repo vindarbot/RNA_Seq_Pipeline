@@ -38,7 +38,7 @@ for path in DIRS:
 
 rule all:	
 	input:
-		output = expand("pass1/{sample}.bam", sample=SAMPLES)
+		output = expand("pass2/{sample}.bam", sample=SAMPLES)
 
 
 
@@ -350,23 +350,24 @@ rule firstPass:
 # }
 
 
-# rule secondPass:
-# 	input:
-# 		gtf = GTF,
-# 		genome = GENOME,
-# 		r1 = 'TrimmingHS/{sample}_R1.trim.adapt.fastq.gz',
-# 		r2 = 'TrimmingHS/{sample}_R2.trim.adapt.fastq.gz'
+rule secondPass:
+	input:
+		genome = GENOME,
+		r1 = 'TrimmingHS/{sample}_R1.trim.adapt.fastq.gz',
+		r2 = 'TrimmingHS/{sample}_R2.trim.adapt.fastq.gz'
 
-# 	output:
-# 		"pass2/{sample}.bam"
+	output:
+		"pass2/{sample}.bam"
 
-# 	threads: 4
+	threads: 1
 
-# 	shell:' STAR --runThreadN {threads} --genomeDir genomeForPass2 --sjdbGTFfile {input.gtf} \
-# 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
-# 		--alignEndsType EndToEnd --sjdbOverhang 114 --readFilesCommand "gunzip -c" \
-# 		--outSAMtype BAM SortedByCoordinate; \
-# 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
+	shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
+		--alignIntronMax 299999 \
+		--genomeDir genomeForPass2 \
+		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+		--alignEndsType EndToEnd --sjdbOverhang 114 --readFilesCommand "gunzip -c" \
+		--outSAMtype BAM SortedByCoordinate; \
+		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
 
