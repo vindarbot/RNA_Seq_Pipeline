@@ -36,9 +36,10 @@ for path in DIRS:
 
 
 
-rule all:	
+rule analyse_differentielle:	
 	input:
-		output = expand("pass2/{sample}.bam", sample=SAMPLES)
+		up ="DEG/genes_up.txt"
+		
 
 
 
@@ -103,12 +104,12 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
 	input:
 		adapters = ADAPTERS,
-		r1 = 'Experience/{sample}_R1.fastq.gz',
-		r2 = 'Experience/{sample}_R2.fastq.gz'
+		r1 = expand('Experience/{sample}_R1.fastq.gz', sample=SAMPLES),
+		r2 = expand('Experience/{sample}_R2.fastq.gz', sample=SAMPLES)
 
 	output:
-		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+		r1 = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
+		r2 = expand('Trimming/{sample}_R2.trim.fastq.gz', sample=SAMPLES)
 
 	message: ''' --- Trimming  --- '''
 
@@ -118,18 +119,18 @@ rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
 
 
 
-# rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
-# 	input:
-# 		adapters = ADAPTERS,
-# 		r = 'Experience/{sample}.fastq.gz'
+rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
+	input:
+		adapters = ADAPTERS,
+		r = 'Experience/{sample}.fastq.gz'
 
-# 	output:
-# 		r = 'Trimming/{sample}.trim.fastq.gz'
+	output:
+		r = 'Trimming/{sample}.trim.fastq.gz'
 
-# 	message: ''' --- Trimming  --- '''
+	message: ''' --- Trimming  --- '''
 
-# 	shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
-# 		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
+	shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
+		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
 
 
 
@@ -142,7 +143,6 @@ TRANSCRIPTOME = "Reference/transcriptome.fasta"
 rule indexation_genome:		# Indexation du génome de référence 
 	input:
 		genome = GENOME,
-		gtf = GTF,
 		starref = 'Reference/star/'
 
 	output:
@@ -180,23 +180,23 @@ rule mapping_PE:
 
 
 
-# rule mapping_SE:		
-# 	input:
-# 		gtf = GTF,
-# 		index = "Reference/star/chrName.txt",
-# 		starref = 'Reference/star/',
-# 		r = 'Trimming/{sample}.trim.fastq.gz'
+rule mapping_SE:		
+	input:
+		gtf = GTF,
+		index = "Reference/star/chrName.txt",
+		starref = 'Reference/star/',
+		r = 'Trimming/{sample}.trim.fastq.gz'
 
-# 	output:
-# 		"Mapping/{sample}.bam"
+	output:
+		"Mapping/{sample}.bam"
 
-# 	message: ''' --- Alignement des lectures --- '''
+	message: ''' --- Alignement des lectures --- '''
 
-# 	threads: 6
+	threads: 6
 
-# 	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --genomeDir {input.starref} \
-# 		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r} --outSAMtype BAM SortedByCoordinate; \
-# 		mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
+	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --genomeDir {input.starref} \
+		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r} --outSAMtype BAM SortedByCoordinate; \
+		mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
 
 
 
@@ -236,23 +236,23 @@ rule featureCounts:
 
 	threads: 16
 
-	shell: ''' featureCounts -T {threads} -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
+	shell: ''' featureCounts -p -s 2 -T {threads} -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
 
 
-rule featureCounts_CDS:
-	input:
-		mapping = expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
-		index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
+# rule featureCounts_CDS:
+# 	input:
+# 		mapping = expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
+# 		index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
 
-	output:
-		"DEU/counts/featureCounts.txt"
+# 	output:
+# 		"DEU/counts/featureCounts.txt"
 
-	params:
-		gtf = GTF
+# 	params:
+# 		gtf = GTF
 
-	threads: 16
+# 	threads: 16
 
-	shell: ''' featureCounts -T {threads} -t CDS -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
+# 	shell: ''' featureCounts -p -s 2 -T {threads} -t CDS -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
 
 
 
@@ -285,48 +285,49 @@ rule DESeq2:
         '''
 
 
-### Analyse des transcrits différentiellement exprimés (quantification avec Salmon, analyse avec Sleuth)
 
-rule salmonQuant:
-	input:
-		transcriptome = TRANSCRIPTOME,
-		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+# ### Analyse des transcrits différentiellement exprimés (quantification avec Salmon, analyse avec Sleuth)
 
-
-	output:
-		"DTE/{sample}/quant.sf"
-
-	params:
-		index = "Reference/Index_salmon",
-		boots = 30 
-
-	threads: 8
-
-	shell: ''' salmon index -t {input.transcriptome} -i {params.index} -p {threads}; \
-	salmon quant -i {params.index} -l A -p {threads} -1 {input.r1} -2 {input.r2} -o "DTE/{wildcards.sample}" --numBootstraps {params.boots} '''
+# rule salmonQuant:
+# 	input:
+# 		transcriptome = TRANSCRIPTOME,
+# 		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+# 		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
 
+# 	output:
+# 		"DTE/{sample}/quant.sf"
+
+# 	params:
+# 		index = "Reference/Index_salmon",
+# 		boots = 30 
+
+# 	threads: 8
+
+# 	shell: ''' salmon index -t {input.transcriptome} -i {params.index} -p {threads}; \
+# 	salmon quant -i {params.index} -l A -p {threads} -1 {input.r1} -2 {input.r2} -o "DTE/{wildcards.sample}" --numBootstraps {params.boots} '''
 
 
 
-rule firstPass:
-	input:
-		gtf = GTF,
-		genome = GENOME,
-		r1 = 'TrimmingHS/{sample}_R1.trim.adapt.fastq.gz',
-		r2 = 'TrimmingHS/{sample}_R2.trim.adapt.fastq.gz'
 
-	output:
-		"pass1/{sample}.bam"
 
-	threads: 4
+# rule firstPass:
+# 	input:
+# 		gtf = GTF,
+# 		genome = GENOME,
+# 		r1 = 'TrimmingHS/{sample}_R1.trim.adapt.fastq.gz',
+# 		r2 = 'TrimmingHS/{sample}_R2.trim.adapt.fastq.gz'
 
-	shell:' STAR --runThreadN {threads} --genomeDir pass1/Ref --sjdbGTFfile {input.gtf} \
-		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
-		--readFilesCommand "gunzip -c" \
-		--outSAMtype BAM SortedByCoordinate; \
-		mv pass1/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
+# 	output:
+# 		"pass1/{sample}.bam"
+
+# 	threads: 4
+
+# 	shell:' STAR --runThreadN {threads} --genomeDir pass1/Ref --sjdbGTFfile {input.gtf} \
+# 		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+# 		--readFilesCommand "gunzip -c" \
+# 		--outSAMtype BAM SortedByCoordinate; \
+# 		mv pass1/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
 # awk 'BEGIN {OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";} {if($5>0){print $1,$2,$3,strChar[$4]}}' Alignement/*pass1/SJ.out.tab > Alignement/SJ.out.tab.Pass1.sjdb
@@ -350,24 +351,24 @@ rule firstPass:
 # }
 
 
-rule secondPass:
-	input:
-		genome = GENOME,
-		r1 = 'TrimmingHS/{sample}_R1.trim.adapt.fastq.gz',
-		r2 = 'TrimmingHS/{sample}_R2.trim.adapt.fastq.gz'
+# rule secondPass:
+# 	input:
+# 		genome = GENOME,
+# 		r1 = 'TrimmingHS/{sample}_R1.trim.adapt.fastq.gz',
+# 		r2 = 'TrimmingHS/{sample}_R2.trim.adapt.fastq.gz'
 
-	output:
-		"pass2/{sample}.bam"
+# 	output:
+# 		"pass2/{sample}.bam"
 
-	threads: 1
+# 	threads: 1
 
-	shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
-		--alignIntronMax 299999 \
-		--genomeDir genomeForPass2 \
-		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
-		--alignEndsType EndToEnd --sjdbOverhang 114 --readFilesCommand "gunzip -c" \
-		--outSAMtype BAM SortedByCoordinate; \
-		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
+# 	shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
+# 		--alignIntronMax 299999 \
+# 		--genomeDir genomeForPass2 \
+# 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+# 		--alignEndsType EndToEnd --sjdbOverhang 114 --readFilesCommand "gunzip -c" \
+# 		--outSAMtype BAM SortedByCoordinate; \
+# 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
 

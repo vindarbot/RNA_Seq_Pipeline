@@ -11,7 +11,7 @@ library(DEXSeq)
 library(docopt)
 
 
-
+source("Subread_to_DEXSeq/load_SubreadOutput.R")
 
 dir = setwd("~/Desktop/Data")
 
@@ -26,7 +26,8 @@ system.file( "python_scripts", package="DEXSeq", mustWork=TRUE )
 
 ## ----loadDEXSeq---------------------------------------------------------------
 
-countFiles = list.files("DEU/Counts", pattern=".tsv$", full.names=TRUE)
+#countFiles = list.files("DEU/Counts", pattern=".tsv$", full.names=TRUE)
+
 
 flattenedFile = list.files("Reference", pattern="reference.DEXSeq.gff", full.names=TRUE)
 
@@ -34,22 +35,23 @@ flattenedFile = list.files("Reference", pattern="reference.DEXSeq.gff", full.nam
 ## ----sampleTable--------------------------------------------------------------
 
 sampleTable = data.frame(
-  row.names = c("Col_1","Col_2","hon4_1","hon4_2","hon4_3"),
-  condition = c("Col","Col","hon4","hon4","hon4"),
-  libType = c("paired-end","paired-end","paired-end","paired-end","paired-end")
+  row.names = c("Col_1","Col_2","Col_3","ColHS_1","ColHS_2","ColHS_3"),
+  condition = c("Col","Col","Col","ColHS","ColHS","ColHS")
 )
 
 
 ## ----makeecs, eval=TRUE-------------------------------------------------------
 
-dxd = DEXSeqDataSetFromHTSeq (
-  countFiles,
-  sampleData=sampleTable,
-  design= ~ sample + exon + condition:exon,
-  flattenedfile=flattenedFile )
+#dxd = DEXSeqDataSetFromHTSeq (
+#  countFiles,
+#  sampleData=sampleTable,
+#  design= ~ sample + exon + condition:exon,
+#  flattenedfile=flattenedFile )
 
+dxd = DEXSeqDataSetFromFeatureCounts("featureCountsHS/counts.txt", flattenedfile = "featureCounts_pass2/counts.txt",sampleData = sampleTable)
 
-## ----seeColData---------------------------------------------------------------
+## ----seeColData--s
+-------------------------------------------------------------
 colData(dxd)
 
 ## ----seeCounts----------------------------------------------------------------

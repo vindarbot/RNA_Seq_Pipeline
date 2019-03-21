@@ -40,6 +40,5 @@ rule all:
 rule prepare_annotation_for_dexseq:
     input: GTF
     output: 'Reference/reference.DEXSeq.gff'
-    shell:
-        r'''source activate python2 && python /panfs/cmb-panasas2/skchoudh/software_frozen/anaconda27/envs/python2/lib/R/library/DEXSeq/python_scripts/dexseq_prepare_annotation.py {input} {output}
+    shell:'''source activate python2 && python /panfs/cmb-panasas2/skchoudh/software_frozen/anaconda27/envs/python2/lib/R/library/DEXSeq/python_scripts/dexseq_prepare_annotation.py {input} {output}
         '''

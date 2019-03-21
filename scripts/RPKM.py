@@ -19,24 +19,26 @@ import glob
 from collections import defaultdict
 from decimal import *
 
+# le premier argument a donné au script est la matrice de comptage de reads par gène par featureCounts
 featureCounts = open(sys.argv[1],"r")
 
-# lignes récupère chaque ligne du fichier sous forme d'une liste
+# On récupère chaque ligne du fichier sous forme d'une liste
 lignes = featureCounts.readlines()
 
-# On initialise un dictionnaire qui récupère chaque échantillon (2ème ligne du fichier featureCounts"[1], 
-# et à partir de la 7ème colonne "[6:]")
+# On initialise un dictionnaire qui récupère chaque échantillon (le nom des échantillons sont retrouvés au sein de la 2ème ligne du fichier 
+# featureCounts, accessibles de cette manière :  lignes[1] , à partir de la 7ème colonne : .rstrip().split()[6:] )
 
 sample_to_total_reads = defaultdict(int)
 
 [sample_to_total_reads[sample] for sample in range(len(lignes[1].rstrip().split()[6:]))]
 
 
-# Pour calculer le nombre total de reads comptés dans chaque alignement
+# Pour calculer le nombre total de reads comptés dans chaque alignement (à partir de la 3ème ligne du fichier : lignes[2:])
 # A chaque ligne le compteur "sample" se déplace pour récuperer le nombre de reads
 # pour un gène, et implémente la valeur dans le dictionnaire sample_to_total_reads
 
 for ligne in lignes[2:]:
+
 	for sample in range(len(ligne.rstrip().split()[6:])):
 
 		sample_to_total_reads[sample] += int(ligne.rstrip().split()[6:][sample])
@@ -46,7 +48,7 @@ for ligne in lignes[2:]:
 
 with open("RPKM.txt", "w") as RPKM:
 
-	# Header dui fichier avec le nom des échantillons
+	# Header du fichier avec le nom des échantillons
 	# On accède au nom des échantillons dans la 2ème ligne du fichier généré par featureCounts (lignes[1])
 	RPKM.write("\t")
 	for sample in lignes[1].rstrip().split()[6:]:
@@ -65,7 +67,7 @@ with open("RPKM.txt", "w") as RPKM:
 			RPKM_value = int(ligne.rstrip().split()[6:][sample]) / ((int(ligne.rstrip().split()[5]) / 1000) * (int(sample_to_total_reads[sample])) / 1e6 )
 			RPKM_value = round(RPKM_value,2)
 
-			#        RPKM = nombre de reads compté pour un échantillon    longueur du gène (6ème colonne du fichier) / 1000       nombre total de reads de l'échantillon / 1e6
+			#        RPKM = nombre de reads compté pour un échantillon  /  longueur du gène (6ème colonne du fichier) / 1000    *   nombre total de reads de l'échantillon / 1e6
 			RPKM.write(str(RPKM_value)+"\t")
 		RPKM.write("\n")
 
