@@ -271,7 +271,9 @@ rule make_b_files:
 
 	output:
 		b1 = "b1.txt",
-		b2 = "b2.txt",
+		b2 = "b2.txt"
+
+	params:
 		rMATSdir_raw = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
 
 	params:
@@ -288,7 +290,7 @@ rule make_b_files:
 		with open(output.b2,'w') as file2:
 			file2.write(",".join(params.files2))
 
-		os.mkdirs(output.rMATSdir_raw)
+		os.mkdirs(params.rMATSdir_raw)
 
 
 rule rMATS:
@@ -297,7 +299,7 @@ rule rMATS:
 		starRef = "genomeForPass2/",
 		b1 = "b1.txt",
 		b2 = "b2.txt",
-		
+		dir = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
 
 
 	output:
