@@ -45,7 +45,7 @@ rule all:
 		pass1 = expand("pass1/{sample}SJ.out.tab", sample=SAMPLES),
 		filt_SJ = expand("pass1/{sample}SJ.out.filt.tab", sample=SAMPLES),
 		SJ_db = "Reference/SJ.db",
-		genomePass2 = "genomeForPass2/chrName.txt",
+		genomePass2 = "genomeForPass2/chrName.txt"
 		pass2 = expand("pass2/{sample}.bam", sample=SAMPLES)
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
@@ -246,11 +246,13 @@ rule pass2:
 
 	shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
  		--alignIntronMax 299999 \
- 		--genomeDir {starRed} \
+ 		--genomeDir {input.starRef} \
  		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
  		--alignEndsType EndToEnd --sjdbOverhang  {params.read_length} --readFilesCommand "gunzip -c" \
  		--outSAMtype BAM SortedByCoordinate; \
  		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
+
+
 
 
 

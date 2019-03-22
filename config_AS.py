@@ -34,7 +34,10 @@ CUT_TRIM   =		115
 
 
 
-### Mapping
+### rMATS
+
+CONDITION1 = "Col"
+CONDITION2 = "Kaku4"
 
 
 
