@@ -215,7 +215,7 @@ rule filt_SJ_out:
 		"SJ.filt.tab"
 
 	shell:''' 
-	gawk '$6==1 || ($6==0 && $7>2)' {wildcards.sample} >> {output};
+	gawk '$6==1 || ($6==0 && $7>2)' {input} >> {output};
 	'''
 
 
