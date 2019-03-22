@@ -286,12 +286,13 @@ rule make_b_files:
 			file2.write(",".join(params.files2))
 
 		os.mkdir(params.rMATSdir)
+		os.mkdir(params.rMATSdir="/rMATS_output")
 
 
 rule rMATS:
 	input:
 		gtf = GTF,
-		starRef = "genomeForPass2/"
+		starRef = "genomeForPass2/",
 		b1 = "b1.txt",
 		b2 = "b2.txt",
 
