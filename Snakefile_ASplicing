@@ -210,10 +210,10 @@ rule pass1:
 
 rule filt_SJ_out:
 	input: 
-		"pass1/{sample}SJ.out.tab"
+		expand("pass1/{sample}SJ.out.tab", sample=SAMPLES)
 
 	output:
-		"pass1/{sample}SJ.out.filt.tab"
+		"SJ.filt.tab"
 
 	shell:''' 
 	gawk '$6==1 || ($6==0 && $7>2)' {input} >> {output};
@@ -232,7 +232,37 @@ rule SJ_db:
 	'''
 
 
+rule genomeForPass2:
+	input:
+		genome = GENOME,
+		SJ = "Reference/SJ.db"
 
+	output:
+		"genomeForPass2/chrName.txt"
+
+	params:
+		genomedir = "genomeForPass2/"
+
+	shell:' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
+	--genomeDir {params.genomedir} --genomeFastaFiles {input.genome} --sjdbFileChrStartEnd {input.SJ}'
+
+
+
+
+
+
+
+
+
+	# threads: 4
+
+	# shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
+ # 		--alignIntronMax 299999 \
+ # 		--genomeDir genomeForPass2 \
+ # 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+ # 		--alignEndsType EndToEnd --sjdbOverhang 114 --readFilesCommand "gunzip -c" \
+ # 		--outSAMtype BAM SortedByCoordinate; \
+ # 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
 
