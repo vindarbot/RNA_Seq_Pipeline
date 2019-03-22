@@ -45,7 +45,8 @@ rule all:
 		pass1 = expand("pass1/{sample}SJ.out.tab", sample=SAMPLES),
 		filt_SJ = expand("pass1/{sample}SJ.out.filt.tab", sample=SAMPLES),
 		SJ_db = "Reference/SJ.db",
-		genomePass2 = "genomeForPass2/chrName.txt"
+		genomePass2 = "genomeForPass2/chrName.txt",
+		pass2 = expand("pass2/{sample}.bam", sample=SAMPLES)
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
@@ -163,31 +164,7 @@ rule indexation_genome:		# Indexation du génome de référence
 	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
 
 
-# if PAIRED_END:
-# 	rule mapping_PE:		
-# 		input:
-# 			gtf = GTF,
-# 			index = "Reference/star/chrName.txt",
-# 			starref = 'Reference/star/',
-# 			r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-# 			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
-# 		output:
-# 			"Mapping/{sample}.bam"
-
-# 		message: ''' --- Alignement des lectures --- '''
-
-# 		threads: 6
-
-# 		shell: ' STAR --runThreadN {threads} \
-# 		--sjdbGTFfile {input.gtf} --sjdbOverhang 100 \
-# 		--genomeDir {input.starref} \
-# 		--outFileNamePrefix Mapping/{wildcards.sample} \
-# 		--readFilesIn {input.r1} {input.r2} \
-# 		--alignEndsType EndToEnd \
-# 		--outSAMtype BAM SortedByCoordinate; \
-# 		mv Mapping/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};\
-# 		mv Mapping/{wildcards.sample}*out* Mapping/Out'		
 
 
 rule pass1:
@@ -250,6 +227,30 @@ rule genomeForPass2:
 	shell:' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
 	--genomeDir {params.genomedir} --genomeFastaFiles {input.genome} --sjdbFileChrStartEnd {input.SJ}'
 
+
+rule pass2:
+	input:
+		genome = GENOME,
+		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+		r2 = 'Trimming/{sample}_R2.trim.fastq.gz',
+		starRef = 'genomeForPass2/'
+
+	output:
+		"pass2/{sample}.bam"
+
+	params:
+		read_length = CUT_TRIM - 1
+
+
+	threads: 4
+
+	shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
+ 		--alignIntronMax 299999 \
+ 		--genomeDir {starRed} \
+ 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+ 		--alignEndsType EndToEnd --sjdbOverhang  {params.read_length} --readFilesCommand "gunzip -c" \
+ 		--outSAMtype BAM SortedByCoordinate; \
+ 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
 
