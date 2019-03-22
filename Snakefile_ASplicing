@@ -216,7 +216,23 @@ rule filt_SJ_out:
 
 	shell:''' 
 	gawk '$6==1 || ($6==0 && $7>2)' {input} >> {output};
+
 	'''
+
+rule SJ_db:
+	input:
+		"SJ.filt.tab"
+
+	output: 
+		"Reference/SJ.db"
+
+	shell: '''
+	awk 'BEGIN \{OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";} \{if($5>0){print $1,$2,$3,strChar[$4]\}\}' {input} > {output}
+	'''
+
+
+
+
 
 
 
