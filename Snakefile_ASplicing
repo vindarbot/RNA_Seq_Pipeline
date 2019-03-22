@@ -208,7 +208,6 @@ rule pass1:
 
 
 rule create_SJ_gtf:
-
 	input: 
 		"pass1/{sample}SJ.out.tab"
 
