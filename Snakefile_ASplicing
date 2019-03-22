@@ -279,10 +279,10 @@ rule make_b_files:
 		rMATSdir = "DAS/"+CONDITION1+"_VS_"+CONDITION2
 
 	run:
-		with(output.b1,'w') as file1:
+		with open(output.b1,'w') as file1:
 			file1.write(params.files1)
 
-		with(output.b2,'w') as file2:
+		with open(output.b2,'w') as file2:
 			file2.write(params.files2)
 
 		os.mkdir(params.rMATSdir)
