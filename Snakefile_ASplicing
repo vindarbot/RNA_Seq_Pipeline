@@ -269,11 +269,11 @@ rule make_b_files:
 		expand("pass2/{sample}.bam", sample=SAMPLES)
 
 	output:
-		b1 = "b1.txt"
+		b1 = "b1.txt",
 		b2 = "b2.txt"
 
 	params:
-		files1 = [cond1_bam for cond1_bam in glob.glob("pass2/*bam") if cond1_bam.startswith("pass2/"+CONDITION1)]
+		files1 = [cond1_bam for cond1_bam in glob.glob("pass2/*bam") if cond1_bam.startswith("pass2/"+CONDITION1)],
 		files2 = [cond2_bam for cond2_bam in glob.glob("pass2/*bam") if cond2_bam.startswith("pass2/"+CONDITION2)]
 
 		rMARSdir = "DAS/"+CONDITION1+"_VS_"+CONDITION2
