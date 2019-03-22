@@ -155,7 +155,7 @@ rule indexation_genome:		# Indexation du génome de référence
 # 
 	message: ''' --- Indexation du génome de référence --- '''
 # 
-	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {read_length} \
+	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
 	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
 
 
