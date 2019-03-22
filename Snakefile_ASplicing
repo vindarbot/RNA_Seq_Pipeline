@@ -43,7 +43,7 @@ rule all:
 		trimming = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
 		starRef = "Reference/star/chrName.txt",
 		pass1 = expand("pass1/{sample}SJ.out.tab", sample=SAMPLES),
-		SJ_db = "Reference/SJ.db"
+		filt_SJ = "SJ.filt.tab"
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
@@ -207,18 +207,24 @@ rule pass1:
 		--outSAMtype BAM Unsorted'
 
 
-rule create_SJ_gtf:
+rule filt_SJ_out:
 	input: 
-		"pass1/*SJ.out.tab"
+		"pass1/{sample}SJ.out.tab"
 
 	output:
-		"Reference/SJ.db"
+		"SJ.filt.tab"
 
 	shell:''' 
-	gawk '$6==1 || ($6==0 && $7>2)' {input} > SJ.filt.tab;
-	awk 'BEGIN {OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";} \{if($5>0)\{print $1,$2,$3,strChar[$4]\}\}' SJ.filt.tab > {output};
-	rm SJ.filt.tab
+	gawk '$6==1 || ($6==0 && $7>2)' {wildcards.sample} >> {output};
 	'''
+
+
+
+
+# '''
+# 	awk 'BEGIN {OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";} \{if($5>0)\{print $1,$2,$3,strChar[$4]\}\}' SJ.filt.tab > {output};
+# 	rm SJ.filt.tab
+# 	'''
 
 
 
