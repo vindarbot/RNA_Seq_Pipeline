@@ -42,7 +42,8 @@ rule all:
 		xpDesign = "experimentalDesign.txt",
 		trimming = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
 		starRef = "Reference/star/chrName.txt",
-		pass1 = expand("pass1/{sample}.bam", sample=SAMPLES)
+		pass1 = expand("pass1/{sample}SJ.out.tab", sample=SAMPLES),
+		SJ_db = "Reference/SJ.db"
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
@@ -196,15 +197,29 @@ rule pass1:
 		starRef = 'Reference/star'
 
 	output:
-		"pass1/{sample}.bam"
+		"pass1/{sample}SJ.out.tab"
 
 	threads: 4
 
 	shell:' STAR --runThreadN {threads} --genomeDir {input.starRef} --sjdbGTFfile {input.gtf} \
 		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
 		--readFilesCommand "gunzip -c" \
-		--outSAMtype BAM Unsorted; \
-		mv pass1/{wildcards.sample}* {output};'
+		--outSAMtype BAM Unsorted'
+
+
+rule create_SJ_gtf:
+
+	input: 
+		"pass1/{sample}SJ.out.tab"
+
+	output:
+		"Reference/SJ.db"
+
+	shell:''' 
+	gawk '$6==1 || ($6==0 && $7>2)' pass1/*SJ.out.tab > SJ.filt.tab;
+	awk 'BEGIN {OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";} \{if($5>0)\{print $1,$2,$3,strChar[$4]\}\}' SJ.filt.tab > {output};
+	rm SJ.filt.tab
+	'''
 
 
 
