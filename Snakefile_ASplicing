@@ -279,7 +279,13 @@ rule make_b_files:
 		rMARSdir = "DAS/"+CONDITION1+"_VS_"+CONDITION2
 
 	run:
-		print(params[2])
+		with(output[1],'w') as file:
+			file.write(params[1])
+
+		with(output[2],'w') as file:
+			file.write(params[2])
+
+		os.mkdir(params[3])
 
 
 
