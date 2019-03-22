@@ -25,7 +25,7 @@ CONDITIONS = list(set(x.split("_")[0] for x in SAMPLES))
 CONDITION_TO_SAMPLES = {}
 
 for condition in CONDITIONS:
-	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.startswith(condition)]
+	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.split()("_")[0] == condition]
 
 
 DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG','DTE','DEU','DEU/counts']
@@ -171,7 +171,7 @@ rule mapping_PE:
 	threads: 4
 
 	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} \
-		--sjdbOverhang '+str(READ_LENGHT-1)+' --genomeDir {input.starref} \
+		--genomeDir {input.starref} \
 		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
 		--readFilesCommand "gunzip -c" \
 		--outSAMtype BAM SortedByCoordinate; \

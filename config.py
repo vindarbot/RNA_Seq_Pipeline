@@ -35,7 +35,7 @@ minlen   =		25
 ktrim    =		"r" 
 k        =		22
 qtrim    =		"rl" 
-trimq    =		10 
+trimq    =		20 
 hdist    =		1
 
 
