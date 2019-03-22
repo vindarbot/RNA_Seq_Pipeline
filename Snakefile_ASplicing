@@ -187,7 +187,7 @@ rule indexation_genome:		# Indexation du génome de référence
 # 		mv Mapping/{wildcards.sample}*out* Mapping/Out'		
 
 
-rule firstPass:
+rule pass1:
 	input:
 		gtf = GTF,
 		genome = GENOME,
