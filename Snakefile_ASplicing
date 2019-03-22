@@ -209,13 +209,13 @@ rule pass1:
 
 rule create_SJ_gtf:
 	input: 
-		"pass1/{sample}SJ.out.tab"
+		"pass1/*SJ.out.tab"
 
 	output:
 		"Reference/SJ.db"
 
 	shell:''' 
-	gawk '$6==1 || ($6==0 && $7>2)' pass1/*SJ.out.tab > SJ.filt.tab;
+	gawk '$6==1 || ($6==0 && $7>2)' {input} > SJ.filt.tab;
 	awk 'BEGIN {OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";} \{if($5>0)\{print $1,$2,$3,strChar[$4]\}\}' SJ.filt.tab > {output};
 	rm SJ.filt.tab
 	'''
