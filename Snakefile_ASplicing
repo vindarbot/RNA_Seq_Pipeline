@@ -314,9 +314,18 @@ rule rMATS:
 
 
 
+EVENTS = glob.glob("DAG/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/*MATS.JCEC.txt")
 
+rule rMATS_sig:
+	input:
+		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/SE.MATS.JCEC.txt"
 
+	output:
+		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/_topSplicingEvents"
 
+	run:
+		for AS_EVENT in EVENTS:
+			os.shell(python3 scripts/rMATS_filt.py AS_EVENT)
 
 
 

@@ -134,7 +134,6 @@ rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
 
 
 
-
 GENOME = "Reference/reference.fasta"
 GTF = "Reference/reference.gtf"
 TRANSCRIPTOME = "Reference/transcriptome.fasta"
@@ -237,24 +236,6 @@ rule featureCounts:
 	threads: 16
 
 	shell: ''' featureCounts -p -s 2 -T {threads} -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
-
-
-# rule featureCounts_CDS:
-# 	input:
-# 		mapping = expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
-# 		index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
-
-# 	output:
-# 		"DEU/counts/featureCounts.txt"
-
-# 	params:
-# 		gtf = GTF
-
-# 	threads: 16
-
-# 	shell: ''' featureCounts -p -s 2 -T {threads} -t CDS -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
-
-
 
 
 
