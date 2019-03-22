@@ -38,7 +38,7 @@ for path in DIRS:
 
 files1 = [cond1_bam for cond1_bam in glob.glob("pass2/*bam") if cond1_bam.startswith("pass2/"+CONDITION1)]
 
-print(files1)
+print(",".join(files1))
 
 # rule all:	
 # 	input:
