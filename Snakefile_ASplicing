@@ -106,8 +106,8 @@ if PAIRED_END:
 			r2 = 'Experience/{sample}_R2.fastq.gz'
 
 		output:
-			r1 = 'Trimming/{sample}_R1.trim.fastq',
-			r2 = 'Trimming/{sample}_R2.trim.fastq'
+			r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
 		params:
 			cut_trim = CUT_TRIM
@@ -123,7 +123,7 @@ else:
 			r = 'Experience/{sample}.fastq.gz'
 
 		output:
-			'Trimming/{sample}.trim.fastq'
+			'Trimming/{sample}.trim.fastq.gz'
 
 		params:
 			cut_trim = CUT_TRIM
@@ -160,8 +160,8 @@ else:
 # 			gtf = GTF,
 # 			index = "Reference/star/chrName.txt",
 # 			starref = 'Reference/star/',
-# 			r1 = 'Trimming/{sample}_R1.trim.fastq',
-# 			r2 = 'Trimming/{sample}_R2.trim.fastq'
+# 			r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+# 			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
 # 		output:
 # 			"Mapping/{sample}.bam"
