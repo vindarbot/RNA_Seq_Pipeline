@@ -43,7 +43,8 @@ rule all:
 		trimming = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
 		starRef = "Reference/star/chrName.txt",
 		pass1 = expand("pass1/{sample}SJ.out.tab", sample=SAMPLES),
-		filt_SJ = expand("pass1/{sample}SJ.out.filt.tab", sample=SAMPLES)
+		filt_SJ = expand("pass1/{sample}SJ.out.filt.tab", sample=SAMPLES),
+		SJ_db = "Reference/SJ.db"
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
