@@ -274,7 +274,7 @@ rule make_b_files:
 
 	params:
 		files1 = [cond1_bam for cond1_bam in glob.glob("pass2/*bam") if cond1_bam.startswith("pass2/"+CONDITION1)],
-		files2 = [cond2_bam for cond2_bam in glob.glob("pass2/*bam") if cond2_bam.startswith("pass2/"+CONDITION2)]
+		files2 = [cond2_bam for cond2_bam in glob.glob("pass2/*bam") if cond2_bam.startswith("pass2/"+CONDITION2)],
 
 		rMARSdir = "DAS/"+CONDITION1+"_VS_"+CONDITION2
 
