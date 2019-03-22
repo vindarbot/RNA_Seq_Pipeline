@@ -29,239 +29,262 @@ for condition in CONDITIONS:
 
 
 
-DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','pass1','genomeForPass2','pass2']
+DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','DAS','pass1','genomeForPass2','pass2']
 
 for path in DIRS:
 	if not os.path.exists(path):
 		os.mkdir(path)
 
 
-files1 = [cond1_bam for cond1_bam in glob.glob("pass2/*bam") if cond1_bam.startswith("pass2/"+CONDITION1)]
 
-print(",".join(files1))
 
-# rule all:	
-# 	input:
-# 		xpDesign = "experimentalDesign.txt",
-# 		trimming = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
-# 		starRef = "Reference/star/chrName.txt",
-# 		pass1 = expand("pass1/{sample}SJ.out.tab", sample=SAMPLES),
-# 		filt_SJ = expand("pass1/{sample}SJ.out.filt.tab", sample=SAMPLES),
-# 		SJ_db = "Reference/SJ.db",
-# 		genomePass2 = "genomeForPass2/chrName.txt",
-# 		pass2 = expand("pass2/{sample}.bam", sample=SAMPLES)
-# #		expand("Mapping/{sample}.bam", sample=SAMPLES)
+
+
+rule all:	
+	input:
+		xpDesign = "experimentalDesign.txt",
+		trimming = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
+		starRef = "Reference/star/chrName.txt",
+		pass1 = expand("pass1/{sample}SJ.out.tab", sample=SAMPLES),
+		filt_SJ = expand("pass1/{sample}SJ.out.filt.tab", sample=SAMPLES),
+		SJ_db = "Reference/SJ.db",
+		genomePass2 = "genomeForPass2/chrName.txt",
+		pass2 = expand("pass2/{sample}.bam", sample=SAMPLES)
+#		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
 
 
 
 
-# rule xpDesign: 		# Création d'un fichier txt qui décrit simplement le design expérimental, ceci est nécessaire pour l'étape d'analyse des gènes différentiellement exprimés sous R
-# 	output:
-# 		"experimentalDesign.txt"
+rule xpDesign: 		# Création d'un fichier txt qui décrit simplement le design expérimental, ceci est nécessaire pour l'étape d'analyse des gènes différentiellement exprimés sous R
+	output:
+		"experimentalDesign.txt"
 
-# 	run:
-# 		with open("experimentalDesign.txt","w") as xpDesign:
-# 			xpDesign.write("batch,condition\n")
+	run:
+		with open("experimentalDesign.txt","w") as xpDesign:
+			xpDesign.write("batch,condition\n")
 
-# 			for condition,samples in CONDITION_TO_SAMPLES.items():
-# 				for sample in samples:
-# 					xpDesign.write(sample+".sorted.bam,"+condition+"\n")
+			for condition,samples in CONDITION_TO_SAMPLES.items():
+				for sample in samples:
+					xpDesign.write(sample+".sorted.bam,"+condition+"\n")
 
 
 
 
 
-# FASTA_NAME = os.path.basename(GET_GENOME)
-# GTF_NAME = os.path.basename(GET_GTF)
-# DESCRIPTION_NAME = os.path.basename(GET_DESCRIPTION)
+FASTA_NAME = os.path.basename(GET_GENOME)
+GTF_NAME = os.path.basename(GET_GTF)
+DESCRIPTION_NAME = os.path.basename(GET_DESCRIPTION)
 
 
-# rule get_reference_files:	# Règle qui récupère le génome de référence ainsi que le fichier
-# 							# d'annotation des gènes d'une espèce donnée
-# 	output:
-# 		fasta = "Reference/reference.fasta",
-# 		gtf = "Reference/reference.gtf",
-# 		description = "description.txt"
+rule get_reference_files:	# Règle qui récupère le génome de référence ainsi que le fichier
+							# d'annotation des gènes d'une espèce donnée
+	output:
+		fasta = "Reference/reference.fasta",
+		gtf = "Reference/reference.gtf",
+		description = "description.txt"
 
-# 	params:
-# 		get_genome = GET_GENOME,
-# 		get_gtf = GET_GTF,
-# 		get_description = GET_DESCRIPTION,
-# 		fasta_name = FASTA_NAME,
-# 		gtf_name = GTF_NAME,
-# 		description_name = DESCRIPTION_NAME
+	params:
+		get_genome = GET_GENOME,
+		get_gtf = GET_GTF,
+		get_description = GET_DESCRIPTION,
+		fasta_name = FASTA_NAME,
+		gtf_name = GTF_NAME,
+		description_name = DESCRIPTION_NAME
 
-# 	message: ''' --- downloading fasta and gtf files --- '''
+	message: ''' --- downloading fasta and gtf files --- '''
 
-# 	shell: ''' 
-# 		wget {params.get_genome}; mv {params.fasta_name} {output.fasta}
-# 		wget {params.get_gtf}; mv {params.gtf_name} reference.gff
-# 		awk '{{ sub(/'ChrM'/,"mitochondria"); sub(/'ChrC'/,"chloroplast"); sub(/'Chr'/,"");print}}' reference.gff > reference_clean.gff
-# 		rm reference.gff
-# 		gffread reference_clean.gff -T -o {output.gtf}
-# 		rm reference_clean.gff
-# 		wget {params.get_description}
-# 		mv {params.description_name} {output.description}
-# 		'''
+	shell: ''' 
+		wget {params.get_genome}; mv {params.fasta_name} {output.fasta}
+		wget {params.get_gtf}; mv {params.gtf_name} reference.gff
+		awk '{{ sub(/'ChrM'/,"mitochondria"); sub(/'ChrC'/,"chloroplast"); sub(/'Chr'/,"");print}}' reference.gff > reference_clean.gff
+		rm reference.gff
+		gffread reference_clean.gff -T -o {output.gtf}
+		rm reference_clean.gff
+		wget {params.get_description}
+		mv {params.description_name} {output.description}
+		'''
 
 
 
-# if PAIRED_END:
-# 	rule trimming_PE: 		
-# 		input:
-# 			r1 = 'Experience/{sample}_R1.fastq.gz',
-# 			r2 = 'Experience/{sample}_R2.fastq.gz'
+if PAIRED_END:
+	rule trimming_PE: 		
+		input:
+			r1 = 'Experience/{sample}_R1.fastq.gz',
+			r2 = 'Experience/{sample}_R2.fastq.gz'
 
-# 		output:
-# 			r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-# 			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+		output:
+			r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
-# 		params:
-# 			cut_trim = CUT_TRIM
+		params:
+			cut_trim = CUT_TRIM
 
-# 		message: ''' --- Trimming  --- '''
+		message: ''' --- Trimming  --- '''
 
-# 		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output.r1} -p {output.r2} {input.r1} {input.r2} -j 8 --pair-filter=any '
+		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output.r1} -p {output.r2} {input.r1} {input.r2} -j 8 --pair-filter=any '
 
 
-# else:
-# 	rule trimming_SE: 		
-# 		input:
-# 			r = 'Experience/{sample}.fastq.gz'
+else:
+	rule trimming_SE: 		
+		input:
+			r = 'Experience/{sample}.fastq.gz'
 
-# 		output:
-# 			'Trimming/{sample}.trim.fastq.gz'
+		output:
+			'Trimming/{sample}.trim.fastq.gz'
 
-# 		params:
-# 			cut_trim = CUT_TRIM
+		params:
+			cut_trim = CUT_TRIM
 
-# 		message: ''' --- Trimming  --- '''
+		message: ''' --- Trimming  --- '''
 
-# 		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} -j 8 --pair-filter=any '
+		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} -j 8 --pair-filter=any '
 
 
-# GENOME = "Reference/reference.fasta"
-# GTF = "Reference/reference.gtf"
-# # 
-# # 
-# rule indexation_genome:		# Indexation du génome de référence 
-# 	input:
-# 		genome = GENOME,
-# 		gtf = GTF,
-# 		starref = 'Reference/star/'
-# # 
-# 	output:
-# 		"Reference/star/chrName.txt"
+GENOME = "Reference/reference.fasta"
+GTF = "Reference/reference.gtf"
+# 
+# 
+rule indexation_genome:		# Indexation du génome de référence 
+	input:
+		genome = GENOME,
+		gtf = GTF,
+		starref = 'Reference/star/'
+# 
+	output:
+		"Reference/star/chrName.txt"
 
-# 	params:
-# 		read_length = CUT_TRIM - 1
+	params:
+		read_length = CUT_TRIM - 1
 
-# # 
-# 	threads: 8
-# # 
-# 	message: ''' --- Indexation du génome de référence --- '''
-# # 
-# 	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
-# 	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
+# 
+	threads: 8
+# 
+	message: ''' --- Indexation du génome de référence --- '''
+# 
+	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
+	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
 
 
 
 
 
-# rule pass1:
-# 	input:
-# 		gtf = GTF,
-# 		genome = GENOME,
-# 		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-# 		r2 = 'Trimming/{sample}_R2.trim.fastq.gz',
-# 		starRef = 'Reference/star'
+rule pass1:
+	input:
+		gtf = GTF,
+		genome = GENOME,
+		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+		r2 = 'Trimming/{sample}_R2.trim.fastq.gz',
+		starRef = 'Reference/star'
 
-# 	output:
-# 		"pass1/{sample}SJ.out.tab"
+	output:
+		"pass1/{sample}SJ.out.tab"
 
-# 	threads: 4
+	threads: 4
 
-# 	shell:' STAR --runThreadN {threads} --genomeDir {input.starRef} --sjdbGTFfile {input.gtf} \
-# 		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
-# 		--readFilesCommand "gunzip -c" \
-# 		--outSAMtype BAM Unsorted'
+	shell:' STAR --runThreadN {threads} --genomeDir {input.starRef} --sjdbGTFfile {input.gtf} \
+		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+		--readFilesCommand "gunzip -c" \
+		--outSAMtype BAM Unsorted'
 
 
 
-# rule filt_SJ_out:
-# 	input: 
-# 		expand("pass1/{sample}SJ.out.tab", sample=SAMPLES)
+rule filt_SJ_out:
+	input: 
+		expand("pass1/{sample}SJ.out.tab", sample=SAMPLES)
 
-# 	output:
-# 		"SJ.filt.tab"
+	output:
+		"SJ.filt.tab"
 
-# 	shell:''' 
-# 	gawk '$6==1 || ($6==0 && $7>2)' {input} >> {output};
+	shell:''' 
+	gawk '$6==1 || ($6==0 && $7>2)' {input} >> {output};
 
-# 	'''
+	'''
 
 
 
-# rule SJ_db:
-# 	input:
-# 		"SJ.filt.tab"
+rule SJ_db:
+	input:
+		"SJ.filt.tab"
 
-# 	output: 
-# 		"Reference/SJ.db"
+	output: 
+		"Reference/SJ.db"
 
-# 	shell: '''
-# 	awk 'BEGIN {{OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";}} {{if($5>0){{print $1,$2,$3,strChar[$4]}}}}' {input} > {output}
-# 	'''
+	shell: '''
+	awk 'BEGIN {{OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";}} {{if($5>0){{print $1,$2,$3,strChar[$4]}}}}' {input} > {output}
+	'''
 
 
 
-# rule genomeForPass2:
-# 	input:
-# 		genome = GENOME,
-# 		SJ = "Reference/SJ.db"
+rule genomeForPass2:
+	input:
+		genome = GENOME,
+		SJ = "Reference/SJ.db"
 
-# 	output:
-# 		"genomeForPass2/chrName.txt"
+	output:
+		"genomeForPass2/chrName.txt"
 
-# 	params:
-# 		genomedir = "genomeForPass2/",
-# 		read_length = CUT_TRIM - 1
+	params:
+		genomedir = "genomeForPass2/",
+		read_length = CUT_TRIM - 1
 
-# 	threads: 4
+	threads: 4
 
-# 	shell:' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
-# 	--genomeDir {params.genomedir} --genomeFastaFiles {input.genome} --sjdbFileChrStartEnd {input.SJ}'
+	shell:' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
+	--genomeDir {params.genomedir} --genomeFastaFiles {input.genome} --sjdbFileChrStartEnd {input.SJ}'
 
 
 
 
-# rule pass2:
-# 	input:
-# 		genome = GENOME,
-# 		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-# 		r2 = 'Trimming/{sample}_R2.trim.fastq.gz',
-# 		starRef = 'genomeForPass2/'
+rule pass2:
+	input:
+		genome = GENOME,
+		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+		r2 = 'Trimming/{sample}_R2.trim.fastq.gz',
+		starRef = 'genomeForPass2/'
 
-# 	output:
-# 		"pass2/{sample}.bam"
+	output:
+		"pass2/{sample}.bam"
 
-# 	params:
-# 		read_length = CUT_TRIM - 1
+	params:
+		read_length = CUT_TRIM - 1
 
 
-# 	threads: 4
+	threads: 4
 
-# 	shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
-#  		--alignIntronMax 299999 \
-#  		--genomeDir {input.starRef} \
-#  		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
-#  		--alignEndsType EndToEnd --sjdbOverhang  {params.read_length} --readFilesCommand "gunzip -c" \
-#  		--outSAMtype BAM SortedByCoordinate; \
-#  		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
+	shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
+ 		--alignIntronMax 299999 \
+ 		--genomeDir {input.starRef} \
+ 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+ 		--alignEndsType EndToEnd --sjdbOverhang  {params.read_length} --readFilesCommand "gunzip -c" \
+ 		--outSAMtype BAM SortedByCoordinate; \
+ 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
+
+rule make_b_files:
+	input:
+		expand("pass2/{sample}.bam", sample=SAMPLES)
+
+	output:
+		b1 = "b1.txt"
+		b2 = "b2.txt"
+
+	params:
+		files1 = [cond1_bam for cond1_bam in glob.glob("pass2/*bam") if cond1_bam.startswith("pass2/"+CONDITION1)]
+		files2 = [cond2_bam for cond2_bam in glob.glob("pass2/*bam") if cond2_bam.startswith("pass2/"+CONDITION2)]
+
+		rMARSdir = "DAS/"+CONDITION1+"_VS_"+CONDITION2
+
+	run:
+		with(output[0],'w') as file:
+			file.write(params[0])
+
+		with(output[1],'w') as file:
+			file.write(params[1])
+
+		os.mkdir(params[2])
 
 
 
