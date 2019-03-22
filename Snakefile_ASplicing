@@ -29,11 +29,11 @@ for condition in CONDITIONS:
 
 
 
-# DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','rMATS']
+DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','pass1','genomeForPass2','pass2']
 
-# for path in DIRS:
-# 	if not os.path.exists(path):
-# 		os.mkdir(path)
+for path in DIRS:
+	if not os.path.exists(path):
+		os.mkdir(path)
 
 
 
@@ -41,7 +41,8 @@ rule all:
 	input:
 		xpDesign = "experimentalDesign.txt",
 		trimming = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
-		starRef = "Reference/star/chrName.txt"
+		starRef = "Reference/star/chrName.txt",
+		pass1 = expand("pass1/{sample}.bam", sample=SAMPLES)
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
@@ -186,23 +187,24 @@ rule indexation_genome:		# Indexation du génome de référence
 # 		mv Mapping/{wildcards.sample}*out* Mapping/Out'		
 
 
-# rule firstPass:
-# 	input:
-# 		gtf = GTF,
-# 		genome = GENOME,
-# 		r1 = 'TrimmingHS/{sample}_R1.trim.adapt.fastq.gz',
-# 		r2 = 'TrimmingHS/{sample}_R2.trim.adapt.fastq.gz'
+rule firstPass:
+	input:
+		gtf = GTF,
+		genome = GENOME,
+		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+		starRef = 'Reference/star'
 
-# 	output:
-# 		"pass1/{sample}.bam"
+	output:
+		"pass1/{sample}.bam"
 
-# 	threads: 4
+	threads: 4
 
-# 	shell:' STAR --runThreadN {threads} --genomeDir pass1/Ref --sjdbGTFfile {input.gtf} \
-# 		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
-# 		--readFilesCommand "gunzip -c" \
-# 		--outSAMtype BAM SortedByCoordinate; \
-# 		mv pass1/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
+	shell:' STAR --runThreadN {threads} --genomeDir {starRef} --sjdbGTFfile {input.gtf} \
+		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+		--readFilesCommand "gunzip -c" \
+		--outSAMtype BAM ; \
+		mv pass1/{wildcards.sample}* {output};'
 
 
 
