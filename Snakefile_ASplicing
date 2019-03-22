@@ -40,7 +40,7 @@ for condition in CONDITIONS:
 rule all:	
 	input:
 		xpDesign = "experimentalDesign.txt",
-		trimming = expand('Trimming/{sample}_R1.trim.fastq', sample=SAMPLES)
+		trimming = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES)
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
