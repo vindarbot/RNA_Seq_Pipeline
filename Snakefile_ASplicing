@@ -52,7 +52,7 @@ rule all:
 		pass2 = expand("pass2/{sample}.bam", sample=SAMPLES),
 		b1 = "b1.txt",
 		out_rMATS = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/SE.MATS.JCEC.txt",
-		AS_sig = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/_topSplicingEvents"
+		AS_sig = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/topSplicingEvents"
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
@@ -310,19 +310,19 @@ rule rMATS:
 		read_length = CUT_TRIM
 
 	shell:'''
-		python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py --b1 {input.b1} --b2 {input.b2} --readLength {params.read_length} -t paired --gtf {input.gtf} --bi {input.starRef} --od {input.dir} --libType fr-firststrand''' 
+		python2.7 /Users/vindarbo/happy_bin/rMATS.4.0.1/rMATS-turbo-Mac-UCS2/rmats.py --b1 {input.b1} --b2 {input.b2} --readLength {params.read_length} -t paired --gtf {input.gtf} --bi {input.starRef} --od {input.dir} --libType fr-firststrand''' 
 
 
 
 
-EVENTS = glob.glob("DAG/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/*MATS.JCEC.txt")
+EVENTS = glob.glob("DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/*MATS.JCEC.txt")
 
 rule rMATS_sig:
 	input:
 		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/SE.MATS.JCEC.txt"
 
 	output:
-		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/_topSplicingEvents"
+		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/topSplicingEvents"
 
 	run:
 		for AS_EVENT in EVENTS:

@@ -59,7 +59,7 @@ colnames(featureMatrix) <- gsub(".sorted.bam","",colnames(featureMatrix))
 
 
 featureMatrix <- as.matrix(featureMatrix)
-head(maxMedian)
+
 # On récupère les conditions expérimentales 
 conditionTest <- factor(xpdesign$condition)
 
@@ -119,7 +119,7 @@ dds <- estimateSizeFactors(dds)
 
 dds = estimateDispersions( dds)
 dds <- DESeq(dds)
-
+?estimateDispersions
 # On transorme le nombre de reads comptés par le log de ce nombre, afin de minimiser les grands écarts
 # pouvant être observés entre les gènes avec peu de reads comptés, et les gènes avec beaucoup de reads comptés
 rld <- rlog(dds, blind = FALSE)
@@ -179,7 +179,7 @@ gene_description[,1]=genenames
 
 ## Ici on récupère la description des gènes différentiellement exprimés, en regardant les identifants
 # des gènes qui "matchent" entre les deux fichiers
-genes_match_rows <- match(rownames(genes_identifiants), gene_description[,1])
+genes_match_rows <- match(rownames(genes_signif), gene_description[,1])
 
 
 
@@ -249,8 +249,8 @@ genes_down <- genes_down[order(genes_down$padj,decreasing = F),]
 
 # Enfin on génère le fichiers de sortie des gènes up et down
 
-write_tsv(as.data.frame(genes_up),outprefix+"genes_up.txt")
-write_tsv(as.data.frame(genes_down),outprefix+"genes_down.txt")
+write_tsv(as.data.frame(genes_up),"DEG/genes_up.txt")
+write_tsv(as.data.frame(genes_down),"DEG/genes_down.txt")
 
 
 
