@@ -44,7 +44,7 @@ rule all:
 		starRef = "Reference/star/chrName.txt",
 		pass1 = expand("pass1/{sample}SJ.out.tab", sample=SAMPLES),
 		filt_SJ = expand("pass1/{sample}SJ.out.filt.tab", sample=SAMPLES),
-		SJ_db = "Reference/SJ.db"
+		SJ_db = "Reference/SJ.db",
 		genomePass2 = s"genomeForPass2/chrName.txt"
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
