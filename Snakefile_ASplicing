@@ -36,7 +36,7 @@ for path in DIRS:
 		os.mkdir(path)
 
 
-files1 = [cond1_bam for cond1_bam in glob.glob("pass2/*bam") if cond1_bam.startswith(CONDITION1)]
+files1 = [cond1_bam for cond1_bam in glob.glob("pass2/*bam") if cond1_bam.startswith("pass2/"+CONDITION1)]
 
 print(files1)
 
