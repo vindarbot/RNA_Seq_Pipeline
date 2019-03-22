@@ -203,7 +203,7 @@ rule pass1:
 	shell:' STAR --runThreadN {threads} --genomeDir {input.starRef} --sjdbGTFfile {input.gtf} \
 		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
 		--readFilesCommand "gunzip -c" \
-		--outSAMtype BAM ; \
+		--outSAMtype BAM Unsorted; \
 		mv pass1/{wildcards.sample}* {output};'
 
 
