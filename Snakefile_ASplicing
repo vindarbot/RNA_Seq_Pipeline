@@ -288,6 +288,22 @@ rule make_b_files:
 		os.mkdir(params.rMATSdir)
 
 
+rule rMATS:
+	input:
+		gtf = GTF,
+		starRef = "genomeForPass2/"
+		b1 = "b1.txt",
+		b2 = "b2.txt",
+
+
+	output:
+		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
+
+	params:
+		read_length = CUT_TRIM
+
+	run:
+		python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py --b1 input.b1 --b2 input.b2 --readLength params.read_length -t paired --gtf input.gtf --bi input.starRef --od output[0] --libType fr-firststrand &
 
 
 
