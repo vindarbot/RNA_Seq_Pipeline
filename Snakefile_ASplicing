@@ -245,6 +245,8 @@ rule genomeForPass2:
 		genomedir = "genomeForPass2/",
 		read_length = CUT_TRIM - 1
 
+	threads: 4
+
 	shell:' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
 	--genomeDir {params.genomedir} --genomeFastaFiles {input.genome} --sjdbFileChrStartEnd {input.SJ}'
 
