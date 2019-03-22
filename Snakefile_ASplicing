@@ -51,7 +51,8 @@ rule all:
 		genomePass2 = "genomeForPass2/chrName.txt",
 		pass2 = expand("pass2/{sample}.bam", sample=SAMPLES),
 		b1 = "b1.txt",
-		out_rMATS = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/SE.MATS.JCEC.txt"
+		out_rMATS = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/SE.MATS.JCEC.txt",
+		AS_sig = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/_topSplicingEvents"
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
