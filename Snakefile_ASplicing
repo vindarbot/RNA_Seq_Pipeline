@@ -285,7 +285,7 @@ rule make_b_files:
 		with open(output.b2,'w') as file2:
 			file2.write(",".join(params.files2))
 
-		os.mkdir(params[3])
+		os.mkdir(params.rMATSdir)
 
 
 
