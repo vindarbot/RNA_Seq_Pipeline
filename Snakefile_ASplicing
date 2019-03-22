@@ -200,7 +200,7 @@ rule pass1:
 
 	threads: 4
 
-	shell:' STAR --runThreadN {threads} --genomeDir {starRef} --sjdbGTFfile {input.gtf} \
+	shell:' STAR --runThreadN {threads} --genomeDir {input.starRef} --sjdbGTFfile {input.gtf} \
 		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
 		--readFilesCommand "gunzip -c" \
 		--outSAMtype BAM ; \
