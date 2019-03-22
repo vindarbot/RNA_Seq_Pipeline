@@ -277,6 +277,7 @@ rule make_b_files:
 		files2 = [cond2_bam for cond2_bam in glob.glob("pass2/*bam") if cond2_bam.startswith("pass2/"+CONDITION2)],
 
 		rMATSdir = "DAS/"+CONDITION1+"_VS_"+CONDITION2
+		rMATSdir_raw = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
 
 	run:
 		with open(output.b1,'w') as file1:
@@ -286,7 +287,7 @@ rule make_b_files:
 			file2.write(",".join(params.files2))
 
 		os.mkdir(params.rMATSdir)
-		os.mkdir(params.rMATSdir="/rMATS_output")
+		os.mkdir(params.rMATSdir_raw)
 
 
 rule rMATS:
@@ -298,7 +299,7 @@ rule rMATS:
 
 
 	output:
-		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
+		out = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
 
 	params:
 		read_length = CUT_TRIM
