@@ -192,7 +192,7 @@ rule firstPass:
 		gtf = GTF,
 		genome = GENOME,
 		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+		r2 = 'Trimming/{sample}_R2.trim.fastq.gz',
 		starRef = 'Reference/star'
 
 	output:
