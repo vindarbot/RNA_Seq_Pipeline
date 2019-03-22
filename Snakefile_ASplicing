@@ -297,7 +297,7 @@ rule rMATS:
 		starRef = "genomeForPass2/",
 		b1 = "b1.txt",
 		b2 = "b2.txt",
-		dir = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
+		
 
 
 	output:
@@ -310,9 +310,7 @@ rule rMATS:
 		python2.7 /data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py --b1 {input.b1} --b2 {input.b2} --readLength {params.read_length} -t paired --gtf {input.gtf} --bi {input.starRef} --od {input.dir} --libType fr-firststrand''' 
 
 
-rule rMATS_sig:
-	input:
-		EVENTS = []
+
 
 
 
