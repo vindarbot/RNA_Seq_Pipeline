@@ -25,12 +25,7 @@ CONDITIONS = list(set(x.split("_")[0] for x in SAMPLES))
 CONDITION_TO_SAMPLES = {}
 
 for condition in CONDITIONS:
-	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.startswith(condition)]
-
-
-CON_SAMPLES = list(filter(lambda x: 'Control' in x, SAMPLES))
-BAS_SAMPLES = list(filter(lambda x: 'Basal' in x, SAMPLES))
-
+	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.split("_")[0] == condition]
 
 
 
@@ -135,7 +130,7 @@ else:
 
 		message: ''' --- Trimming  --- '''
 
-		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} '
+		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} -j 8 --pair-filter=any '
 
 
 # GENOME = "Reference/reference.fasta"
@@ -184,7 +179,28 @@ else:
 # 		--outSAMtype BAM SortedByCoordinate; \
 # 		mv Mapping/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};\
 # 		mv Mapping/{wildcards.sample}*out* Mapping/Out'		
-		
+
+
+# rule firstPass:
+# 	input:
+# 		gtf = GTF,
+# 		genome = GENOME,
+# 		r1 = 'TrimmingHS/{sample}_R1.trim.adapt.fastq.gz',
+# 		r2 = 'TrimmingHS/{sample}_R2.trim.adapt.fastq.gz'
+
+# 	output:
+# 		"pass1/{sample}.bam"
+
+# 	threads: 4
+
+# 	shell:' STAR --runThreadN {threads} --genomeDir pass1/Ref --sjdbGTFfile {input.gtf} \
+# 		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+# 		--readFilesCommand "gunzip -c" \
+# 		--outSAMtype BAM SortedByCoordinate; \
+# 		mv pass1/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
+
+
+
 
 # else:
 # 	rule mapping_SE:		
@@ -222,7 +238,6 @@ else:
 
 # 	shell: ''' samtools index {input} > {output} '''
 
-	
 
 
 # # rule rMATs_Con_Bas:
