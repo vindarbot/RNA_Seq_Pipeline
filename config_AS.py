@@ -32,7 +32,7 @@ TRIMMING =		True
 # 151-36 = 115pb (longueur de reads à indiquer à cutadapt)
 CUT_TRIM   =		115
 
-READ_LENGHT_TRIM = READ_LENGHT-CUT_TRIM
+
 
 ### Mapping
 

@@ -40,7 +40,8 @@ for condition in CONDITIONS:
 rule all:	
 	input:
 		xpDesign = "experimentalDesign.txt",
-		trimming = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES)
+		trimming = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
+		starRef = "Reference/star/chrName.txt"
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
@@ -133,25 +134,29 @@ else:
 		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} -j 8 --pair-filter=any '
 
 
-# GENOME = "Reference/reference.fasta"
-# GTF = "reference.gtf"
+GENOME = "Reference/reference.fasta"
+GTF = "reference.gtf"
+# 
+# 
+rule indexation_genome:		# Indexation du génome de référence 
+	input:
+		genome = GENOME,
+		gtf = GTF,
+		starref = 'Reference/star/'
+# 
+	output:
+		"Reference/star/chrName.txt"
 
+	params:
+		read_length = CUT_TRIM - 1
 
-# rule indexation_genome:		# Indexation du génome de référence 
-# 	input:
-# 		genome = GENOME,
-# 		gtf = GTF,
-# 		starref = 'Reference/star/'
-
-# 	output:
-# 		"Reference/star/chrName.txt"
-
-# 	threads: 8
-
-# 	message: ''' --- Indexation du génome de référence --- '''
-
-# 	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate  \
-# 	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
+# 
+	threads: 8
+# 
+	message: ''' --- Indexation du génome de référence --- '''
+# 
+	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {read_length} \
+	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
 
 
 # if PAIRED_END:
