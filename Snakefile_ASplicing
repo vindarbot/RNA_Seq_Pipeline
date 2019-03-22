@@ -49,7 +49,8 @@ rule all:
 		filt_SJ = expand("pass1/{sample}SJ.out.filt.tab", sample=SAMPLES),
 		SJ_db = "Reference/SJ.db",
 		genomePass2 = "genomeForPass2/chrName.txt",
-		pass2 = expand("pass2/{sample}.bam", sample=SAMPLES)
+		pass2 = expand("pass2/{sample}.bam", sample=SAMPLES),
+		b1 = "b1.txt"
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
