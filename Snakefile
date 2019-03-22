@@ -25,7 +25,7 @@ CONDITIONS = list(set(x.split("_")[0] for x in SAMPLES))
 CONDITION_TO_SAMPLES = {}
 
 for condition in CONDITIONS:
-	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.split()("_")[0] == condition]
+	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.split("_")[0] == condition]
 
 
 DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG','DTE','DEU','DEU/counts']
