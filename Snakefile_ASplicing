@@ -74,7 +74,7 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 							# d'annotation des gènes d'une espèce donnée
 	output:
 		fasta = "Reference/reference.fasta",
-		gtf = "reference.gtf",
+		gtf = "Reference/reference.gtf",
 		description = "description.txt"
 
 	params:
@@ -155,7 +155,7 @@ rule indexation_genome:		# Indexation du génome de référence
 # 
 	message: ''' --- Indexation du génome de référence --- '''
 # 
-	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
+	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.lsread_length} \
 	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
 
 
