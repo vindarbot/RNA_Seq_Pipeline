@@ -50,7 +50,8 @@ rule all:
 		SJ_db = "Reference/SJ.db",
 		genomePass2 = "genomeForPass2/chrName.txt",
 		pass2 = expand("pass2/{sample}.bam", sample=SAMPLES),
-		b1 = "b1.txt"
+		b1 = "b1.txt",
+		out_rMATS = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/SE.MATS.JCEC.txt"
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
 
 	
@@ -295,11 +296,12 @@ rule rMATS:
 		gtf = GTF,
 		starRef = "genomeForPass2/",
 		b1 = "b1.txt",
-		b2 = "b2.txt"
+		b2 = "b2.txt",
+		dir = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
 
 
 	output:
-		out = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
+		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/SE.MATS.JCEC.txt"
 
 	params:
 		read_length = CUT_TRIM
