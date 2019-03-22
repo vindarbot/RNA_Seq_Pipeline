@@ -135,7 +135,7 @@ else:
 
 
 GENOME = "Reference/reference.fasta"
-GTF = "reference.gtf"
+GTF = "Reference/reference.gtf"
 # 
 # 
 rule indexation_genome:		# Indexation du génome de référence 
