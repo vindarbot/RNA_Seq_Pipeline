@@ -294,7 +294,7 @@ rule rMATS:
 		gtf = GTF,
 		starRef = "genomeForPass2/",
 		b1 = "b1.txt",
-		b2 = "b2.txt",
+		b2 = "b2.txt"
 
 
 	output:
