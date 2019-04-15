@@ -104,12 +104,12 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
 	input:
 		adapters = ADAPTERS,
-		r1 = expand('Experience/{sample}_R1.'+EXTENSION, sample=SAMPLES),
-		r2 = expand('Experience/{sample}_R2.'+EXTENSION, sample=SAMPLES)
+		r1 = expand('Experience/{sample}_R1.'+EXTENSION+'', sample=SAMPLES),
+		r2 = expand('Experience/{sample}_R2.'+EXTENSION+'', sample=SAMPLES)
 
 	output:
-		r1 = expand('Trimming/{sample}_R1.trim.'+EXTENSION, sample=SAMPLES),
-		r2 = expand('Trimming/{sample}_R2.trim.'+EXTENSION, sample=SAMPLES)
+		r1 = expand('Trimming/{sample}_R1.trim.'+EXTENSION+'', sample=SAMPLES),
+		r2 = expand('Trimming/{sample}_R2.trim.'+EXTENSION+'', sample=SAMPLES)
 
 	message: ''' --- Trimming  --- '''
 
@@ -122,10 +122,10 @@ rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
 rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
 	input:
 		adapters = ADAPTERS,
-		r = expand('Experience/{sample}.'+EXTENSION, sample=SAMPLES)
+		r = expand('Experience/{sample}.'+EXTENSION+'', sample=SAMPLES)
 
 	output:
-		r = expand('Trimming/{sample}.trim.'+EXTENSION, sample=SAMPLES)
+		r = expand('Trimming/{sample}.trim.'+EXTENSION+'', sample=SAMPLES)
 
 	message: ''' --- Trimming  --- '''
 
@@ -159,8 +159,8 @@ rule mapping_PE:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
 		starref = 'Reference/star/',
-		r1 = 'Trimming/{sample}_R1.trim.'+EXTENSION,
-		r2 = 'Trimming/{sample}_R2.trim.'+EXTENSION
+		r1 = 'Trimming/{sample}_R1.trim.'+EXTENSION+'',
+		r2 = 'Trimming/{sample}_R2.trim.'+EXTENSION+''
 
 	output:
 		"Mapping/{sample}.bam"
@@ -184,7 +184,7 @@ rule mapping_SE:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
 		starref = 'Reference/star/',
-		r = expand('Trimming/{sample}.trim.'+EXTENSION, sample=SAMPLES)
+		r = expand('Trimming/{sample}.trim.'+EXTENSION+'', sample=SAMPLES)
 
 	output:
 		"Mapping/{sample}.bam"
