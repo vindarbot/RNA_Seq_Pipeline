@@ -184,7 +184,7 @@ rule mapping_SE:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
 		starref = 'Reference/star/',
-		r = expand('Trimming/{sample}.trim.{extension}', extension=EXTENSION)
+		r = expand('Trimming/{sample}.trim.{extension}', sample=SAMPLES, extension=EXTENSION)
 
 	output:
 		"Mapping/{sample}.bam"
