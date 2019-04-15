@@ -10,12 +10,15 @@
 
 ### General
 
-RMATS = '/data/home/darbotv/happy_bin/rMATS.4.0.2/rMATS-turbo-Linux-UCS4/rmats.py'
+rMATS_DIR = '/Users/vindarbo/happy_bin/rMATS.4.0.1/rMATS-turbo-Mac-UCS2/rmats.py'
 
 
-PAIRED_END = True
+PAIRED_END = False
 
-READ_LENGHT = 	150
+READ_LENGHT = 	90
+
+
+### Reference files
 
 GET_GENOME	=	"https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_chromosome_files/TAIR10_chr_all.fas"
 
@@ -23,21 +26,20 @@ GET_GTF		=	"https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_relea
 
 GET_DESCRIPTION = "https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/gene_description_20131231.txt.gz"
 
-### Trimming
 
-TRIMMING =		True
 
 
 # rMATS demande en entrée une longeur de reads spécifique, on supprime donc 36bp en 3' pour tous les reads (même les reads n'ayant pas d'adaptapteurs)
 # 151-36 = 115pb (longueur de reads à indiquer à cutadapt)
-CUT_TRIM   =		115
+CUT_TRIM   =		90
 
 
 
 ### rMATS
 
+# Noms des conditions pour à analyser pour le différentiel d'épissage alternatif
 CONDITION1 = "Col"
-CONDITION2 = "Kaku4"
+CONDITION2 = "HS"
 
 
 

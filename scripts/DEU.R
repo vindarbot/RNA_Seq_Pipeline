@@ -26,7 +26,7 @@ system.file( "python_scripts", package="DEXSeq", mustWork=TRUE )
 
 ## ----loadDEXSeq---------------------------------------------------------------
 
-#countFiles = list.files("DEU/Counts", pattern=".tsv$", full.names=TRUE)
+countFiles = list.files("DEU/Counts", pattern=".tsv$", full.names=TRUE)
 
 
 flattenedFile = list.files("Reference", pattern="reference.DEXSeq.gff", full.names=TRUE)
@@ -35,11 +35,12 @@ flattenedFile = list.files("Reference", pattern="reference.DEXSeq.gff", full.nam
 ## ----sampleTable--------------------------------------------------------------
 
 sampleTable = data.frame(
-  row.names = c("Col_1","Col_2","Col_3","ColHS_1","ColHS_2","ColHS_3"),
-  condition = c("Col","Col","Col","ColHS","ColHS","ColHS")
+  row.names = c("ColHS_1","ColHS_2","ColHS_3","hon4HS_1","hon4HS_2","hon4HS_3"),
+  condition = c("ColHS","ColHS","ColHS","hon4HS","hon4HS","hon4HS"),
+  type <- c(rep("paired-end", 6))
 )
 
-
+featureCounts <- read_table('featureCounts_pass2/counts.txt')
 ## ----makeecs, eval=TRUE-------------------------------------------------------
 
 #dxd = DEXSeqDataSetFromHTSeq (
@@ -48,7 +49,7 @@ sampleTable = data.frame(
 #  design= ~ sample + exon + condition:exon,
 #  flattenedfile=flattenedFile )
 
-dxd = DEXSeqDataSetFromFeatureCounts("featureCountsHS/counts.txt", flattenedfile = "featureCounts_pass2/counts.txt",sampleData = sampleTable)
+dxd = DEXSeqDataSetFromFeatureCounts("featureCounts_pass2/counts_cond.txt", flattenedfile = "Reference/featureCounts.gtf",sampleData = sampleTable)
 
 ## ----seeColData--s
 -------------------------------------------------------------
@@ -88,11 +89,12 @@ dxd = estimateExonFoldChanges( dxd, fitExpToVar="condition")
 dxr1 = DEXSeqResults( dxd )
 
 
-genes_up <- dxr1[ which(dxr1$padj < 0.1 & dxr1$log2fold_hon4_Col > 0), ]
+genes_up <- dxr1[ which(dxr1$padj < 0.1 & dxr1$log2fold_hon4HS_ColHS > 1), ]
 
-genes_down <- dxr1[ which(dxr1$padj < 0.1 & dxr1$log2fold_hon4_Col < 0), ]
+genes_down <- dxr1[ which(dxr1$padj < 0.1 & dxr1$log2fold_hon4HS_ColHS < 1), ]
 
-dxr1[which(dxr1$groupID=="AT2G38460"),]
+plotDEXSeq( dxr1, "AT5G25140", legend=TRUE, cex.axis=1.2, cex=1.3,
+            lwd=2 )
 
 genes_down <- as.data.frame(genes_down)
 genes_up <- as.data.frame(genes_up)
@@ -160,7 +162,7 @@ genes_up <- (merge(x=symbol,y=genes_up,by.x="tair_locus",by.y="ID"))
 genes_down <- (merge(x=symbol,y=genes_down,by.x="tair_locus",by.y="ID"))
 
 
-write_tsv(as.data.frame(genes_up),"DEU/genes_up_DEXSEQ.txt")
+write_tsv(as.data.frame(genes_up),"DEU/ColHS_hon4HS/genes_DEXSEQ.txt")
 write_tsv(as.data.frame(genes_down),"DEU/genes_down_DEXSEQ.txt")
 
 
@@ -290,4 +292,6 @@ findOverlaps( query=dxr, subject=interestingRegion )
 
 ## ----sessionInfo--------------------------------------------------------------
 sessionInfo()
+
+
 

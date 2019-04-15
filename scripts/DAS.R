@@ -1,10 +1,12 @@
-BiocManager::install("IsoformSwitchAnalyzeR")
+BiocManager::install("RATs")
 
 library(IsoformSwitchAnalyzeR)
 library(tximport)
 library(ggplot2)
 
+
 dir = setwd("~/Desktop/Data")
+
 
 
 salmonQuant <- importIsoformExpression(
@@ -72,4 +74,8 @@ extract( exampleSwitchListAnalyzed )
 
 
 analyzeSwitchConsequences(exampleSwitchListAnalyzed)
+
+
+library(RATs)
+
 

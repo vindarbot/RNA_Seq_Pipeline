@@ -24,53 +24,29 @@ CONDITIONS = list(set(x.split("_")[0] for x in SAMPLES))
 
 CONDITION_TO_SAMPLES = {}
 
+DIR_COMPARAISON = "DAS/"+CONDITION1+"_VS_"+CONDITION2
+
 for condition in CONDITIONS:
 	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.split("_")[0] == condition]
 
 
 
-DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','DAS','pass1','genomeForPass2','pass2']
+DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming_AS','DAS','pass1','genomeForPass2','pass2',"DAS",DIR_COMPARAISON,DIR_COMPARAISON+"/rMATS_output/",DIR_COMPARAISON+"/topSplicingEvents"]
 
 for path in DIRS:
 	if not os.path.exists(path):
 		os.mkdir(path)
 
-
+print(SAMPLES)
 
 
 
 
 rule all:	
 	input:
-		xpDesign = "experimentalDesign.txt",
-		trimming = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
-		starRef = "Reference/star/chrName.txt",
-		pass1 = expand("pass1/{sample}SJ.out.tab", sample=SAMPLES),
-		filt_SJ = expand("pass1/{sample}SJ.out.filt.tab", sample=SAMPLES),
-		SJ_db = "Reference/SJ.db",
-		genomePass2 = "genomeForPass2/chrName.txt",
-		pass2 = expand("pass2/{sample}.bam", sample=SAMPLES),
-		b1 = "b1.txt",
-		out_rMATS = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/SE.MATS.JCEC.txt",
-		AS_sig = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/topSplicingEvents"
+		DIR_COMPARAISON+"/topSplicingEvents/DAS.txt"
+		
 #		expand("Mapping/{sample}.bam", sample=SAMPLES)
-
-	
-
-
-
-
-rule xpDesign: 		# Création d'un fichier txt qui décrit simplement le design expérimental, ceci est nécessaire pour l'étape d'analyse des gènes différentiellement exprimés sous R
-	output:
-		"experimentalDesign.txt"
-
-	run:
-		with open("experimentalDesign.txt","w") as xpDesign:
-			xpDesign.write("batch,condition\n")
-
-			for condition,samples in CONDITION_TO_SAMPLES.items():
-				for sample in samples:
-					xpDesign.write(sample+".sorted.bam,"+condition+"\n")
 
 
 
@@ -114,12 +90,12 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 if PAIRED_END:
 	rule trimming_PE: 		
 		input:
-			r1 = 'Experience/{sample}_R1.fastq.gz',
-			r2 = 'Experience/{sample}_R2.fastq.gz'
+			r1 = 'Trimming/{sample}_R1.trim.fastq.gz', 
+			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
 		output:
-			r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+			r1 = 'Trimming_AS/{sample}_R1.trim.fastq.gz',
+			r2 = 'Trimming_AS/{sample}_R2.trim.fastq.gz'
 
 		params:
 			cut_trim = CUT_TRIM
@@ -132,24 +108,24 @@ if PAIRED_END:
 else:
 	rule trimming_SE: 		
 		input:
-			r = 'Experience/{sample}.fastq.gz'
+			'Trimming/{sample}.trim.fastq.gz'
 
 		output:
-			'Trimming/{sample}.trim.fastq.gz'
+			'Trimming_AS/{sample}.trim.fastq.gz'
 
 		params:
 			cut_trim = CUT_TRIM
 
 		message: ''' --- Trimming  --- '''
 
-		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} -j 8 --pair-filter=any '
+		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} -j 8 '
 
 
 GENOME = "Reference/reference.fasta"
 GTF = "Reference/reference.gtf"
 # 
 # 
-rule indexation_genome:		# Indexation du génome de référence 
+rule genomeForPass1:		# Indexation du génome de référence 
 	input:
 		genome = GENOME,
 		gtf = GTF,
@@ -172,24 +148,48 @@ rule indexation_genome:		# Indexation du génome de référence
 
 
 
+if PAIRED_END:
+	rule pass1_PE:
+		input:
+			gtf = GTF,
+			genome = GENOME,
+			r1 = 'Trimming_AS/{sample}_R1.trim.fastq.gz',
+			r2 = 'Trimming_AS/{sample}_R2.trim.fastq.gz',
+			index_info = 'Reference/star/chrName.txt'
 
-rule pass1:
-	input:
-		gtf = GTF,
-		genome = GENOME,
-		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-		r2 = 'Trimming/{sample}_R2.trim.fastq.gz',
-		starRef = 'Reference/star'
+		output:
+			"pass1/{sample}SJ.out.tab"
 
-	output:
-		"pass1/{sample}SJ.out.tab"
+		params:
+			direct = "Reference/star"
 
-	threads: 4
+		threads: 4
 
-	shell:' STAR --runThreadN {threads} --genomeDir {input.starRef} --sjdbGTFfile {input.gtf} \
-		--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
-		--readFilesCommand "gunzip -c" \
-		--outSAMtype BAM Unsorted'
+		shell:' STAR --runThreadN {threads} --genomeDir {params.direct} --sjdbGTFfile {input.gtf} \
+			--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+			--readFilesCommand "gunzip -c" \
+			--outSAMtype BAM Unsorted'
+else:
+	rule pass1_SE:
+		input:
+			gtf = GTF,
+			genome = GENOME,
+			r = 'Trimming_AS/{sample}.trim.fastq.gz',
+			index_info = 'Reference/star/chrName.txt'
+
+		output:
+			"pass1/{sample}SJ.out.tab"
+
+		params:
+			direct = "Reference/star"
+
+		threads: 4
+
+		shell:' STAR --runThreadN {threads} --genomeDir {params.direct} --sjdbGTFfile {input.gtf} \
+			--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r} \
+			--readFilesCommand "gunzip -c" \
+			--outSAMtype BAM Unsorted'
+
 
 
 
@@ -215,7 +215,8 @@ rule SJ_db:
 		"Reference/SJ.db"
 
 	shell: '''
-	awk 'BEGIN {{OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";}} {{if($5>0){{print $1,$2,$3,strChar[$4]}}}}' {input} > {output}
+	awk 'BEGIN {{OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";}} {{if($5>0){{print $1,$2,$3,strChar[$4]}}}}' \
+	 {input} > {output}
 	'''
 
 
@@ -240,30 +241,56 @@ rule genomeForPass2:
 
 
 
-rule pass2:
-	input:
-		genome = GENOME,
-		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-		r2 = 'Trimming/{sample}_R2.trim.fastq.gz',
-		starRef = 'genomeForPass2/'
+if PAIRED_END:
+	rule pass2_PE:
+		input:
+			genome = GENOME,
+			r1 = 'Trimming_AS/{sample}_R1.trim.fastq.gz',
+			r2 = 'Trimming_AS/{sample}_R2.trim.fastq.gz',
+			starRef = "genomeForPass2/chrName.txt"
 
-	output:
-		"pass2/{sample}.bam"
+		output:
+			"pass2/{sample}.bam"
 
-	params:
-		read_length = CUT_TRIM - 1
+		params:
+			read_length = CUT_TRIM - 1,
+			direct = "genomeForPass2/"
 
 
-	threads: 4
+		threads: 4
 
-	shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
- 		--alignIntronMax 299999 \
- 		--genomeDir {input.starRef} \
- 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
- 		--alignEndsType EndToEnd --sjdbOverhang  {params.read_length} --readFilesCommand "gunzip -c" \
- 		--outSAMtype BAM SortedByCoordinate; \
- 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
+		shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
+	 		--alignIntronMax 299999 \
+	 		--genomeDir {params.direct} \
+	 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
+	 		--sjdbOverhang  {params.read_length} --readFilesCommand "gunzip -c" \
+	 		--outSAMtype BAM SortedByCoordinate; \
+	 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
+else:
+	rule pass2_SE:
+		input:
+			genome = GENOME,
+			r = 'Trimming_AS/{sample}.trim.fastq.gz',
+			starRef = "genomeForPass2/chrName.txt"
+
+		output:
+			"pass2/{sample}.bam"
+
+		params:
+			read_length = CUT_TRIM - 1,
+			direct = "genomeForPass2/"
+
+
+		threads: 4
+
+		shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
+	 		--alignIntronMax 299999 \
+	 		--genomeDir {params.direct} \
+	 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r} \
+	 		--sjdbOverhang  {params.read_length} --readFilesCommand "gunzip -c" \
+	 		--outSAMtype BAM SortedByCoordinate; \
+	 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
 rule make_b_files:
@@ -275,58 +302,75 @@ rule make_b_files:
 		b2 = "b2.txt"
 
 	params:
-		rMATSdir_raw = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
-
-	params:
-		files1 = [cond1_bam for cond1_bam in glob.glob("pass2/*bam") if cond1_bam.startswith("pass2/"+CONDITION1)],
-		files2 = [cond2_bam for cond2_bam in glob.glob("pass2/*bam") if cond2_bam.startswith("pass2/"+CONDITION2)],
+		file1 = [cond1_bam for cond1_bam in glob.glob("pass2/*bam") if cond1_bam.startswith("pass2/"+CONDITION1)],
+		file2 = [cond2_bam for cond2_bam in glob.glob("pass2/*bam") if cond2_bam.startswith("pass2/"+CONDITION2)]
 
 		
 		
 
 	run:
 		with open(output.b1,'w') as file1:
-			file1.write(",".join(params.files1))
+			file1.write(",".join(params.file1))
 
 		with open(output.b2,'w') as file2:
-			file2.write(",".join(params.files2))
-
-		os.mkdirs(params.rMATSdir_raw)
-
-
-rule rMATS:
-	input:
-		gtf = GTF,
-		starRef = "genomeForPass2/",
-		b1 = "b1.txt",
-		b2 = "b2.txt",
-		dir = "DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output"
-
-
-	output:
-		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/SE.MATS.JCEC.txt"
-
-	params:
-		read_length = CUT_TRIM
-
-	shell:'''
-		python2.7 /Users/vindarbo/happy_bin/rMATS.4.0.1/rMATS-turbo-Mac-UCS2/rmats.py --b1 {input.b1} --b2 {input.b2} --readLength {params.read_length} -t paired --gtf {input.gtf} --bi {input.starRef} --od {input.dir} --libType fr-firststrand''' 
+			file2.write(",".join(params.file2))
 
 
 
+if PAIRED_END:
+	rule rMATS_PE:
+		input:
+			gtf = GTF,
+			starRef = "genomeForPass2/",
+			b1 = "b1.txt",
+			b2 = "b2.txt",
+			dir = DIR_COMPARAISON+"/rMATS_output"
 
-EVENTS = glob.glob("DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/*MATS.JCEC.txt")
+
+		output:
+			DIR_COMPARAISON+"/rMATS_output/SE.MATS.JCEC.txt"
+
+		params:
+			read_length = CUT_TRIM,
+			rmats_dir = rMATS_DIR
+
+		shell:'''
+			python2.7 {params.rmats_dir} --b1 {input.b1} --b2 {input.b2} --readLength {params.read_length} -t paired --gtf {input.gtf} --bi {input.starRef} --od {input.dir} --libType fr-firststrand''' 
+
+else:
+	rule rMATS_SE:
+		input:
+			gtf = GTF,
+			starRef = "genomeForPass2/",
+			b1 = "b1.txt",
+			b2 = "b2.txt",
+			dir = DIR_COMPARAISON+"/rMATS_output"
+
+
+		output:
+			DIR_COMPARAISON+"/rMATS_output/SE.MATS.JCEC.txt"
+
+		params:
+			read_length = CUT_TRIM,
+			rmats_dir = rMATS_DIR
+
+		shell:'''
+			python2.7 {params.rmats_dir} --b1 {input.b1} --b2 {input.b2} --readLength {params.read_length} -t single --gtf {input.gtf} --bi {input.starRef} --od {input.dir} --libType fr-unstranded''' 
+
+
+
+EVENTS = glob.glob(DIR_COMPARAISON+"/rMATS_output/*MATS.JCEC.txt")
 
 rule rMATS_sig:
 	input:
-		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/rMATS_output/SE.MATS.JCEC.txt"
+		DIR_COMPARAISON+"/rMATS_output/SE.MATS.JCEC.txt"
 
 	output:
-		"DAS/"+CONDITION1+"_VS_"+CONDITION2+"/topSplicingEvents"
+		DIR_COMPARAISON+"/topSplicingEvents/DAS.txt"
 
 	run:
 		for AS_EVENT in EVENTS:
-			os.system("python3 scripts/rMATS_filt.py "+AS_EVENT)
+			os.system("python3 scripts/rMATS_filt.py "+AS_EVENT+"")
 
 
 

@@ -10,7 +10,7 @@ library(AnnotationHub)
 dir = setwd("~/Desktop/Data")
 
 
-path <- "rMATS_hon4HS/"
+path <- "DASG/ColHS_hon4HS/rMATS_outputs"
 
 hon4 <- maser(path, c("ColHS","hon4_HS"), ftype="JCEC")
 

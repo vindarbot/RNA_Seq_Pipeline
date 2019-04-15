@@ -193,7 +193,7 @@ rule mapping_SE:
 
 	threads: 6
 
-	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --genomeDir {input.starref} \
+	shell: ' STAR --runThreadN {threads} --sjdbGTFfile {input.gtf} --genomeDir {input.starref} --readFilesCommand "gunzip -c" \
 		--outFileNamePrefix Mapping/{wildcards.sample} --readFilesIn {input.r} --outSAMtype BAM SortedByCoordinate; \
 		mv Mapping/{wildcards.sample}*.bam {output}; mv Mapping/*out* Mapping/Out '
 
@@ -222,27 +222,52 @@ rule index_bam:
 	shell: ''' samtools index {input} > {output} '''
 
 
-rule featureCounts:
-	input:
-		mapping = expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
-		index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
+if PAIRED_END:
+	rule featureCounts_PE:
+		input:
+			mapping = expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
+			index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
 
-	output:
+		output:
+			"featureCounts/counts.txt"
+
+		params:
+			gtf = GTF
+
+		threads: 16
+
+		shell: ''' featureCounts -p -s 2 -T {threads} -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
+
+else:
+	rule featureCounts_SE:
+		input:
+			mapping = expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
+			index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
+
+		output:
+			"featureCounts/counts.txt"
+
+		params:
+			gtf = GTF
+
+		threads: 16
+
+		shell: ''' featureCounts -T {threads} -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''	
+
+rule RPKM:
+	input:
 		"featureCounts/counts.txt"
 
-	params:
-		gtf = GTF
+	output:
+		"RPKM.txt"
 
-	threads: 16
-
-	shell: ''' featureCounts -p -s 2 -T {threads} -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
-
+	shell: ''' python3 scripts/RPKM.py featureCounts/counts.txt'''
 
 
 rule DESeq2:
 	input:
-		xpdesign = RAWDATA_DIR+"/experimentalDesign.txt",
-		counts = "featureCounts/counts.txt"
+		xpdesign = "experimentalDesign.txt",
+		RPKM = "RPKM.txt"
 
 	output:
 		"DEG/genes_up.txt",
@@ -286,7 +311,7 @@ rule DESeq2:
 # 	threads: 8
 
 # 	shell: ''' salmon index -t {input.transcriptome} -i {params.index} -p {threads}; \
-# 	salmon quant -i {params.index} -l A -p {threads} -1 {input.r1} -2 {input.r2} -o "DTE/{wildcards.sample}" --numBootstraps {params.boots} '''
+# 	salmon quant -i {params.index} -l A -p {threads} -1 {input.r1} -2 {input.r2} -o "DTE/{wildcards.sample}" --validateMappings --numBootstraps {params.boots} '''
 
 
 
