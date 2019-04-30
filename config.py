@@ -10,9 +10,9 @@
 
 ### General
 
-PAIRED_END = False
+PAIRED_END = True
 
-READ_LENGHT = 	50
+READ_LENGHT = 	150
 
 EXTENSION = "fastq"
 

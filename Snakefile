@@ -104,8 +104,8 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
 	input:
 		adapters = ADAPTERS,
-		r1 = expand('Experience/{sample}_R1.'+EXTENSION+'', sample=SAMPLES),
-		r2 = expand('Experience/{sample}_R2.'+EXTENSION+'', sample=SAMPLES)
+		r1 = expand('Experience/{sample}_R1.(fastq|fq).gz', sample=SAMPLES),
+		r2 = expand('Experience/{sample}_R2.(fastq|fq).gz', sample=SAMPLES)
 
 	output:
 		r1 = expand('Trimming/{sample}_R1.trim.'+EXTENSION+'', sample=SAMPLES),
@@ -225,18 +225,16 @@ rule index_bam:
 if PAIRED_END:
 	rule featureCounts_PE:
 		input:
+			gtf = GTF,
 			mapping = expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
 			index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
 
 		output:
 			"featureCounts/counts.txt"
 
-		params:
-			gtf = GTF
-
 		threads: 16
 
-		shell: ''' featureCounts -p -s 2 -T {threads} -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''
+		shell: ''' featureCounts -p -s 2 -T {threads} -t exon -g gene_id -a {input.gtf} -o {output} {input.mapping} '''
 
 else:
 	rule featureCounts_SE:
