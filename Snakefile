@@ -41,11 +41,19 @@ for path in DIRS:
 		os.mkdir(path)
 
 
+FASTA_NAME = os.path.basename(GET_GENOME)
+GTF_NAME = os.path.basename(GET_GTF)
+TRANSCRIPTO_NAME = os.path.basename(GET_TRANSCRIPTO)
+DESCRIPTION_NAME = os.path.basename(GET_DESCRIPTION)
+
+GENOME = "Reference/reference.fasta"
+GTF = "Reference/reference.gtf"
+TRANSCRIPTOME = "Reference/transcriptome.fasta"
+
 
 rule analyse_differentielle:	
 	input:
 		up ="DEG/genes_up.txt",
-		r1 = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
 		
 
 
@@ -66,11 +74,6 @@ rule xpDesign: 		# Création d'un fichier txt qui décrit simplement le design e
 
 
 
-
-FASTA_NAME = os.path.basename(GET_GENOME)
-GTF_NAME = os.path.basename(GET_GTF)
-TRANSCRIPTO_NAME = os.path.basename(GET_TRANSCRIPTO)
-DESCRIPTION_NAME = os.path.basename(GET_DESCRIPTION)
 
 
 rule get_reference_files:	# Règle qui récupère le génome de référence ainsi que le fichier
@@ -138,12 +141,6 @@ else:
 
 		shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
 			ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
-
-
-
-GENOME = "Reference/reference.fasta"
-GTF = "Reference/reference.gtf"
-TRANSCRIPTOME = "Reference/transcriptome.fasta"
 
 
 rule indexation_genome:		# Indexation du génome de référence 

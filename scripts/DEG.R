@@ -15,9 +15,8 @@ Usage:
 opts <- docopt(doc)
 
 
-lfc <- opts[['lfc']]
-lfc <- as.numeric(lfc)  
-padj <- opts[['padj']]
+lfc <- as.numeric(opts[['lfc']])  
+padj <- as.numeric(opts[['padj']])
 xpdesign <- opts[['xpdesign']]
 outprefix <- opts[['outprefix']]
 description <- opts[['description']]
@@ -41,6 +40,14 @@ colnames(RPKM) <- gsub("Mapping.", "", colnames(RPKM))
 colnames(RPKM) <- gsub(".sorted.bam","",colnames(RPKM))
 
 RPKM <- RPKM[,1:ncol(RPKM)-1]
+
+
+RPKM$mean <- rowSums(RPKM)/length(colnames(RPKM))
+
+RPKM$ID <- rownames(RPKM)
+
+RPKM$ExpressionLvl <- ifelse(RPKM$mean <1, "very_low", ifelse(RPKM$mean < 10, "low", ifelse(RPKM$mean < 100, "medium","high")))
+
 
 # On lit la matrice de comptage des reads par gène généré par featureCounts
 featurescounts=read.csv("featureCounts/counts.txt", sep="", head=T, skip=1, row.names = "Geneid")
@@ -101,8 +108,8 @@ featureMatrix = featureMatrix[maxMedian >= 10,]
 #hon4_2          hon4
 
 (coldata <- data.frame(row.names=colnames(featureMatrix[,rownames(xpdesign)]), conditionTest))
-as.factor(xpdesign$condition)
-colnames(coldata)
+
+
 
 # dds permet de transformer la matrice que nous venons de formater en un object DESeq
 # ATTENTION à ce que les colonnes de featureMAtrix soit dans le même ordre que le nom
@@ -119,7 +126,7 @@ dds <- estimateSizeFactors(dds)
 
 dds = estimateDispersions( dds)
 dds <- DESeq(dds)
-?estimateDispersions
+
 # On transorme le nombre de reads comptés par le log de ce nombre, afin de minimiser les grands écarts
 # pouvant être observés entre les gènes avec peu de reads comptés, et les gènes avec beaucoup de reads comptés
 rld <- rlog(dds, blind = FALSE)
@@ -129,6 +136,7 @@ plotPCA(rld, intgroup="conditionTest",ntop = 1000)
 
 # On récupère les résultats obtenus par DESeq2
 res <- results(dds)
+summary(res)
 
 plotMA(res, ylim=c(-5,5))
 
@@ -140,13 +148,11 @@ plotMA(res, ylim=c(-5,5))
 # (exemple log2FoldCHange de 1, soit un FoldChange de 2)
 genes_up = res[ which(res$padj < padj & res$log2FoldChange > lfc), ]
 
+
 # On fait de même pour les gènes sous-exprimés
 genes_down = res[ which(res$padj < padj & res$log2FoldChange < -lfc), ]
 
 genes_up <- genes_up[order(genes_up$padj, decreasing = F),]
-
-## Gènes réprimés lorsque le gène testé est muté
-genes_down = res[ which(res$padj < padj & res$log2FoldChange < -lfc), ]
 
 genes_down <- genes_down[order(genes_down$padj, decreasing = F),]
 
@@ -202,6 +208,8 @@ Code_to_description_down <- gene_description[genes_match_down,c(1,3)]
 colnames(Code_to_description_down) <- c("Code","Description")
 
 
+
+
 # On ajoute la description des gènes dans la variable gene_up et gene_dpwn
 genes_up$Description <- Code_to_description_up$Description
 
@@ -247,10 +255,33 @@ genes_down <- (merge(x=symbol,y=genes_down,by.x="tair_locus",by.y="ID",all.y=TRU
 genes_down <- genes_down[c(1,2,4,8,9)]
 genes_down <- genes_down[order(genes_down$padj,decreasing = F),]
 
+# Pour avoir l'nesemble des résultats et des RPKM
+
+all_results_genes             <- as.data.frame(res)
+
+all_results_genes$ID          <- rownames(all_results_genes)
+
+genes_match                   <-  match(rownames(all_results_genes), gene_description[,1])
+
+Code_to_description           <- gene_description[genes_match,c(1,3)]
+
+all_results_genes$Description <- Code_to_description$Description
+
+all_results_genes             <- (merge(x=symbol,y=all_results_genes,by.x="tair_locus",by.y="ID",all.y=TRUE))
+
+all_results_genes             <- all_results_genes[,c(1,2,4,8)]
+
+all_results_genes             <- (merge(x=RPKM,y=all_results_genes,by.x="ID",by.y="tair_locus",all.y=TRUE))
+
+all_results_genes$DEG         <- ifelse(all_results_genes$padj< padj & all_results_genes$log2FoldChange > lfc,"over",ifelse(all_results_genes$padj < padj & all_results_genes$log2FoldChange < lfc,"under","not_deg"))
+
+
+
 # Enfin on génère le fichiers de sortie des gènes up et down
 
 write_tsv(as.data.frame(genes_up),"DEG/genes_up.txt")
 write_tsv(as.data.frame(genes_down),"DEG/genes_down.txt")
+write_tsv(as.data.frame(all_results_genes),"DEG/all_results_genes.txt")
 
 
 
