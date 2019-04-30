@@ -13,6 +13,12 @@ RAWDATA_DIR = os.getcwd()
 
 FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
 
+wildcards = glob_wildcards('Experience/{fq_files}')
+
+extension = [filename.split('.',1)[1] for filename in wildcards.fq_files][0]
+
+print(extension)
+
 
 if PAIRED_END:
 	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
@@ -38,7 +44,8 @@ for path in DIRS:
 
 rule analyse_differentielle:	
 	input:
-		up ="DEG/genes_up.txt"
+		up ="DEG/genes_up.txt",
+		r1 = expand('Trimming/{sample}_R1.trim.fastq.gz', sample=SAMPLES),
 		
 
 
@@ -100,37 +107,37 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 
 
 
+if PAIRED_END:
+	rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
+		input:
+			adapters = ADAPTERS,
+			r1 = 'Experience/{sample}_R1.'+extension,
+			r2 = 'Experience/{sample}_R2.'+extension
 
-rule trimming_PE: 		# Contrôle qualité des données fastq brutes.
-	input:
-		adapters = ADAPTERS,
-		r1 = expand('Experience/{sample}_R1.(fastq|fq).gz', sample=SAMPLES),
-		r2 = expand('Experience/{sample}_R2.(fastq|fq).gz', sample=SAMPLES)
+		output:
+			r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
-	output:
-		r1 = expand('Trimming/{sample}_R1.trim.'+EXTENSION+'', sample=SAMPLES),
-		r2 = expand('Trimming/{sample}_R2.trim.'+EXTENSION+'', sample=SAMPLES)
+		message: ''' --- Trimming  --- '''
 
-	message: ''' --- Trimming  --- '''
-
-	shell: ' bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
-		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
-
-
+		shell: ' bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
+			ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
 
 
-rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
-	input:
-		adapters = ADAPTERS,
-		r = expand('Experience/{sample}.'+EXTENSION+'', sample=SAMPLES)
 
-	output:
-		r = expand('Trimming/{sample}.trim.'+EXTENSION+'', sample=SAMPLES)
+else:
+	rule trimming_SE: 		# Contrôle qualité des données fastq brutes.
+		input:
+			adapters = ADAPTERS,
+			r = 'Experience/{sample}.'+extension
 
-	message: ''' --- Trimming  --- '''
+		output:
+			r = 'Trimming/{sample}.trim.fastq.gz'
 
-	shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
-		ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
+		message: ''' --- Trimming  --- '''
+
+		shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
+			ref="{input.adapters}" minlen='+str(minlen)+' ktrim='+ktrim+' k='+str(k)+' qtrim='+qtrim+' trimq='+str(trimq)+' hdist='+str(hdist)+' tpe tbo ziplevel=7 '
 
 
 
@@ -159,8 +166,8 @@ rule mapping_PE:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
 		starref = 'Reference/star/',
-		r1 = 'Trimming/{sample}_R1.trim.'+EXTENSION+'',
-		r2 = 'Trimming/{sample}_R2.trim.'+EXTENSION+''
+		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
 	output:
 		"Mapping/{sample}.bam"
@@ -184,7 +191,7 @@ rule mapping_SE:
 		gtf = GTF,
 		index = "Reference/star/chrName.txt",
 		starref = 'Reference/star/',
-		r = expand('Trimming/{sample}.trim.'+EXTENSION+'', sample=SAMPLES)
+		r = 'Trimming/{sample}.trim.fastq.gz'
 
 	output:
 		"Mapping/{sample}.bam"
