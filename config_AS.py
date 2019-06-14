@@ -13,9 +13,9 @@
 rMATS_DIR = '/Users/vindarbo/happy_bin/rMATS.4.0.1/rMATS-turbo-Mac-UCS2/rmats.py'
 
 
-PAIRED_END = False
+PAIRED_END = True
 
-READ_LENGHT = 	90
+READ_LENGHT = 	150
 
 
 ### Reference files
@@ -31,7 +31,7 @@ GET_DESCRIPTION = "https://www.arabidopsis.org/download_files/Genes/TAIR10_genom
 
 # rMATS demande en entrée une longeur de reads spécifique, on supprime donc 36bp en 3' pour tous les reads (même les reads n'ayant pas d'adaptapteurs)
 # 151-36 = 115pb (longueur de reads à indiquer à cutadapt)
-CUT_TRIM   =		90
+CUT_TRIM   =		115
 
 
 
@@ -39,7 +39,7 @@ CUT_TRIM   =		90
 
 # Noms des conditions pour à analyser pour le différentiel d'épissage alternatif
 CONDITION1 = "Col"
-CONDITION2 = "HS"
+CONDITION2 = "Mut"
 
 
 

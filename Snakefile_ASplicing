@@ -13,6 +13,9 @@ RAWDATA_DIR = os.getcwd()
 
 FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
 
+wildcards = glob_wildcards('Experience/{fq_files}')
+
+extension = [filename.split('.',1)[1] for filename in wildcards.fq_files][0]
 
 if PAIRED_END:
 	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
@@ -87,38 +90,38 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 
 
 
-if PAIRED_END:
-	rule trimming_PE: 		
-		input:
-			r1 = 'Trimming/{sample}_R1.trim.fastq.gz', 
-			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+# if PAIRED_END:
+# 	rule trimming_PE: 		
+# 		input:
+# 			r1 = 'Trimming/{sample}_R1.trim.fastq.gz', 
+# 			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
-		output:
-			r1 = 'Trimming_AS/{sample}_R1.trim.fastq.gz',
-			r2 = 'Trimming_AS/{sample}_R2.trim.fastq.gz'
+# 		output:
+# 			r1 = 'Trimming_AS/{sample}_R1.trim.fastq.gz',
+# 			r2 = 'Trimming_AS/{sample}_R2.trim.fastq.gz'
 
-		params:
-			cut_trim = CUT_TRIM
+# 		params:
+# 			cut_trim = CUT_TRIM
 
-		message: ''' --- Trimming  --- '''
+# 		message: ''' --- Trimming  --- '''
 
-		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output.r1} -p {output.r2} {input.r1} {input.r2} -j 8 --pair-filter=any '
+# 		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output.r1} -p {output.r2} {input.r1} {input.r2} -j 8 --pair-filter=any '
 
 
-else:
-	rule trimming_SE: 		
-		input:
-			'Trimming/{sample}.trim.fastq.gz'
+# else:
+# 	rule trimming_SE: 		
+# 		input:
+# 			'Trimming/{sample}.trim.fastq.gz'
 
-		output:
-			'Trimming_AS/{sample}.trim.fastq.gz'
+# 		output:
+# 			'Trimming_AS/{sample}.trim.fastq.gz'
 
-		params:
-			cut_trim = CUT_TRIM
+# 		params:
+# 			cut_trim = CUT_TRIM
 
-		message: ''' --- Trimming  --- '''
+# 		message: ''' --- Trimming  --- '''
 
-		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} -j 8 '
+# 		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} -j 8 '
 
 
 GENOME = "Reference/reference.fasta"
@@ -142,7 +145,7 @@ rule genomeForPass1:		# Indexation du génome de référence
 # 
 	message: ''' --- Indexation du génome de référence --- '''
 # 
-	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
+	shell: ' STAR --runThreadN {threads} --runMode genomeGenerate --genomeSAindexNbases 4 --sjdbOverhang {params.read_length} \
 	--genomeDir {input.starref} --genomeFastaFiles {input.genome} --sjdbGTFfile {input.gtf}'
 
 
@@ -153,8 +156,8 @@ if PAIRED_END:
 		input:
 			gtf = GTF,
 			genome = GENOME,
-			r1 = 'Trimming_AS/{sample}_R1.trim.fastq.gz',
-			r2 = 'Trimming_AS/{sample}_R2.trim.fastq.gz',
+			r1 = 'Trimming_AS/{sample}_1.trim.'+extension,
+			r2 = 'Trimming_AS/{sample}_2.trim.'+extension,
 			index_info = 'Reference/star/chrName.txt'
 
 		output:
@@ -163,11 +166,10 @@ if PAIRED_END:
 		params:
 			direct = "Reference/star"
 
-		threads: 4
+		threads: 1
 
-		shell:' STAR --runThreadN {threads} --genomeDir {params.direct} --sjdbGTFfile {input.gtf} \
+		shell:' STAR --runThreadN {threads} --genomeDir {params.direct} \
 			--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
-			--readFilesCommand "gunzip -c" \
 			--outSAMtype BAM Unsorted'
 else:
 	rule pass1_SE:
@@ -185,7 +187,7 @@ else:
 
 		threads: 4
 
-		shell:' STAR --runThreadN {threads} --genomeDir {params.direct} --sjdbGTFfile {input.gtf} \
+		shell:' STAR --runThreadN {threads} --genomeDir {params.direct} \
 			--outFileNamePrefix pass1/{wildcards.sample} --readFilesIn {input.r} \
 			--readFilesCommand "gunzip -c" \
 			--outSAMtype BAM Unsorted'
@@ -245,8 +247,8 @@ if PAIRED_END:
 	rule pass2_PE:
 		input:
 			genome = GENOME,
-			r1 = 'Trimming_AS/{sample}_R1.trim.fastq.gz',
-			r2 = 'Trimming_AS/{sample}_R2.trim.fastq.gz',
+			r1 = 'Trimming_AS/{sample}_1.trim.'+extension,
+			r2 = 'Trimming_AS/{sample}_2.trim.'+extension,
 			starRef = "genomeForPass2/chrName.txt"
 
 		output:
@@ -263,10 +265,10 @@ if PAIRED_END:
 	 		--alignIntronMax 299999 \
 	 		--genomeDir {params.direct} \
 	 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
-	 		--sjdbOverhang  {params.read_length} --readFilesCommand "gunzip -c" \
+	 		--sjdbOverhang  {params.read_length} \
 	 		--outSAMtype BAM SortedByCoordinate; \
 	 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
-
+# --readFilesCommand "gunzip -c" 
 else:
 	rule pass2_SE:
 		input:

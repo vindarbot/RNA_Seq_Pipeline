@@ -17,8 +17,6 @@ wildcards = glob_wildcards('Experience/{fq_files}')
 
 extension = [filename.split('.',1)[1] for filename in wildcards.fq_files][0]
 
-print(extension)
-
 
 if PAIRED_END:
 	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
@@ -299,15 +297,15 @@ rule DESeq2:
 # rule salmonQuant:
 # 	input:
 # 		transcriptome = TRANSCRIPTOME,
-# 		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-# 		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+# 		r1 = 'Trimming_AS/{sample}_R1.trim.fastq.gz',
+# 		r2 = 'Trimming_AS/{sample}_R2.trim.fastq.gz'
 
 
 # 	output:
 # 		"DTE/{sample}/quant.sf"
 
 # 	params:
-# 		index = "Reference/Index_salmon",
+# 		index = "Reference/Index_Salmon",
 # 		boots = 30 
 
 # 	threads: 8
@@ -377,6 +375,10 @@ rule DESeq2:
 # 		--alignEndsType EndToEnd --sjdbOverhang 114 --readFilesCommand "gunzip -c" \
 # 		--outSAMtype BAM SortedByCoordinate; \
 # 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
+
+
+
+
 
 
 

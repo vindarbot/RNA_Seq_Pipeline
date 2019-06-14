@@ -14,8 +14,6 @@ PAIRED_END = True
 
 READ_LENGHT = 	150
 
-EXTENSION = "fastq"
-
 GET_GENOME	=	"https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_chromosome_files/TAIR10_chr_all.fas"
 
 GET_GTF		=	"https://ics.hutton.ac.uk/atRTD/RTD2/AtRTDv2_QUASI_19April2016.gtf"
