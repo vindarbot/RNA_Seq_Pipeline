@@ -46,7 +46,7 @@ for ligne in lignes[2:]:
 
 # Ouverture du fichier qui va générer la matrice avec les valeurs de RPKM
 
-with open("RPKM.txt", "w") as RPKM:
+with open("DEG/RPKM.txt", "w") as RPKM:
 
 	# Header du fichier avec le nom des échantillons
 	# On accède au nom des échantillons dans la 2ème ligne du fichier généré par featureCounts (lignes[1])

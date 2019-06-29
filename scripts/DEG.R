@@ -34,7 +34,7 @@ xpdesign = read.csv(xpdesign, row.names=1, sep=",")
 # On enlève l'extension du nom des fichiers
 rownames(xpdesign) <- gsub(".sorted.bam","",rownames(xpdesign))
 
-RPKM=read.csv("RPKM.txt",row.names=1,sep="\t")
+RPKM=read.csv("DEG/RPKM.txt",row.names=1,sep="\t")
 
 colnames(RPKM) <- gsub("Mapping.", "", colnames(RPKM))
 colnames(RPKM) <- gsub(".sorted.bam","",colnames(RPKM))
@@ -132,14 +132,15 @@ dds <- DESeq(dds)
 rld <- rlog(dds, blind = FALSE)
 
 # On génère une ACP sur les 1000 gènes les + exprimés 
+jpeg('DEG/pca.jpg')
 plotPCA(rld, intgroup="conditionTest",ntop = 1000)
-
+dev.off()
 # On récupère les résultats obtenus par DESeq2
 res <- results(dds)
-summary(res)
 
+jpeg('DEG/MA.jpg')
 plotMA(res, ylim=c(-5,5))
-
+dev.off()
 
 
 ## Gènes induits lorsque le gène testé est muté
@@ -163,6 +164,7 @@ genes_up <- as.data.frame(genes_up)
 # Ceci sera nécessaire plus tard pour récuperer les Gene Symbols 
 identifiants_genes_up <- rownames(genes_up)
 identifiants_genes_down <- rownames(genes_down)
+identifiants <- c(identifiants_genes_down,identifiants_genes_up)
 
 genes_up$ID <- identifiants_genes_up
 genes_down$ID <- identifiants_genes_down
@@ -282,7 +284,7 @@ all_results_genes$DEG         <- ifelse(all_results_genes$padj< padj & all_resul
 write_tsv(as.data.frame(genes_up),"DEG/genes_up.txt")
 write_tsv(as.data.frame(genes_down),"DEG/genes_down.txt")
 write_tsv(as.data.frame(all_results_genes),"DEG/all_results_genes.txt")
-
+write_tsv(as.data.frame(identifiants),"DEG/tair_ids.txt")
 
 
 

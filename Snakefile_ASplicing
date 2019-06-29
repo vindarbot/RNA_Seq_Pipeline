@@ -34,7 +34,7 @@ for condition in CONDITIONS:
 
 
 
-DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming_AS','DAS','pass1','genomeForPass2','pass2',"DAS",DIR_COMPARAISON,DIR_COMPARAISON+"/rMATS_output/",DIR_COMPARAISON+"/topSplicingEvents"]
+DIRS = ['Trimming_AS','DAS','pass1','genomeForPass2','pass2',"DAS",DIR_COMPARAISON,DIR_COMPARAISON+"/rMATS_output/",DIR_COMPARAISON+"/topSplicingEvents"]
 
 for path in DIRS:
 	if not os.path.exists(path):
@@ -90,38 +90,38 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 
 
 
-# if PAIRED_END:
-# 	rule trimming_PE: 		
-# 		input:
-# 			r1 = 'Trimming/{sample}_R1.trim.fastq.gz', 
-# 			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+if PAIRED_END:
+	rule trimming_PE: 		
+		input:
+			r1 = 'Trimming/{sample}_R1.trim.fastq.gz', 
+			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
 
-# 		output:
-# 			r1 = 'Trimming_AS/{sample}_R1.trim.fastq.gz',
-# 			r2 = 'Trimming_AS/{sample}_R2.trim.fastq.gz'
+		output:
+			r1 = 'Trimming_AS/{sample}_R1.trim.fastq.gz',
+			r2 = 'Trimming_AS/{sample}_R2.trim.fastq.gz'
 
-# 		params:
-# 			cut_trim = CUT_TRIM
+		params:
+			cut_trim = CUT_TRIM
 
-# 		message: ''' --- Trimming  --- '''
+		message: ''' --- Trimming  --- '''
 
-# 		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output.r1} -p {output.r2} {input.r1} {input.r2} -j 8 --pair-filter=any '
+		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output.r1} -p {output.r2} {input.r1} {input.r2} -j 8 --pair-filter=any '
 
 
-# else:
-# 	rule trimming_SE: 		
-# 		input:
-# 			'Trimming/{sample}.trim.fastq.gz'
+else:
+	rule trimming_SE: 		
+		input:
+			'Trimming/{sample}.trim.fastq.gz'
 
-# 		output:
-# 			'Trimming_AS/{sample}.trim.fastq.gz'
+		output:
+			'Trimming_AS/{sample}.trim.fastq.gz'
 
-# 		params:
-# 			cut_trim = CUT_TRIM
+		params:
+			cut_trim = CUT_TRIM
 
-# 		message: ''' --- Trimming  --- '''
+		message: ''' --- Trimming  --- '''
 
-# 		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} -j 8 '
+		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output} {input} -j 8 '
 
 
 GENOME = "Reference/reference.fasta"

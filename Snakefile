@@ -21,7 +21,7 @@ extension = [filename.split('.',1)[1] for filename in wildcards.fq_files][0]
 if PAIRED_END:
 	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
 else:
-	SAMPLES = list(set([ x.rstrip(EXTENSION) for x in FILES]))
+	SAMPLES = list(set([ x.rstrip(extension) for x in FILES]))
 
 
 CONDITIONS = list(set(x.split("_")[0] for x in SAMPLES))
@@ -51,7 +51,7 @@ TRANSCRIPTOME = "Reference/transcriptome.fasta"
 
 rule analyse_differentielle:	
 	input:
-		up ="DEG/genes_up.txt",
+		up ="DEG/genes_up.txt"
 		
 
 

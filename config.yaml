@@ -1,0 +1,99 @@
+### Global parameters
+
+extension: "fastq.gz"
+
+dir:
+
+  rmats : "scripts/rMATS-turbo-Mac-UCS2/rmats.py"
+
+
+ref_files:
+  # TAIR10 genome ref (.fasta), for STAR
+  genome : "https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_chromosome_files/TAIR10_chr_all.fas"
+  # AtRTDv2 gene annotation  (.gtf)
+  gtf : "https://ics.hutton.ac.uk/atRTD/RTD2/AtRTDv2_QUASI_19April2016.gtf"
+  # AtRTDv2 transcriptome file (.fasta), for Salmon
+  transcriptome : "https://ics.hutton.ac.uk/atRTD/RTD2/AtRTDv2_QUASI_19April2016.fa"
+  # roles,functions of genes (.txt)
+  description : "https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/gene_description_20131231.txt.gz"
+
+  adapters : "/Users/vindarbo/happy_bin/bbmap/resources/adapters.fa"
+
+
+design:
+
+  paired : True
+
+  #should be: fr-unstranded , fr-firststrand , fr-secondstrand or fr-unstranded
+  lib_type : fr-firststrand
+
+  read_length : 150
+
+  # Name of the 2 conditions to analyse 
+  condition_1 : "ColHS"
+
+  condition_2 : "HMGA"
+
+
+### QC
+
+trimming:
+
+  exec : True
+
+
+
+DEG : 
+
+  exec : True
+
+  pADJ : 0.05
+
+  LFC : 1
+
+
+DTU :
+
+  exec : True
+
+  pADJ : 0.05
+
+  cutoff : 0.1
+
+
+DASG :
+
+  exec : True
+
+  pADJ : 0.05
+
+  cutoff : 0.15
+  # cut_trim :
+  # length of reads to keep in order to have all reads of same length. Must be adjusted 
+  # according to the range's size of reads obtained after trimming, in order to not delete
+  # too many reads smaller than this value (perform FASTqc to know the range of length values)
+  #
+  # If raw reads are of good quality, recommended to be 80% of initial raw reads length.
+
+  cut_trim : 125
+
+
+# Chromatine State Enrichment (CSE):
+CSE:
+
+  exec : True
+
+  pADJ : 0.01
+
+
+
+
+
+
+
+
+
+
+
+
+
