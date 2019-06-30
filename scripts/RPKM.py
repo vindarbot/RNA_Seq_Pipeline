@@ -63,8 +63,13 @@ with open("DEG/RPKM.txt", "w") as RPKM:
 		RPKM.write(ligne.rstrip().split()[0]+"\t")
 		for sample in range(len(ligne.rstrip().split()[6:])):
 
-
+			print(int(ligne.rstrip().split()[6:][sample]))
+			print(' a')
+			print(((int(ligne.rstrip().split()[5]) / 1000)))
+			print('b')
+			
 			RPKM_value = int(ligne.rstrip().split()[6:][sample]) / ((int(ligne.rstrip().split()[5]) / 1000) * (int(sample_to_total_reads[sample])) / 1e6 )
+
 			RPKM_value = round(RPKM_value,2)
 
 			#        RPKM = nombre de reads compté pour un échantillon  /  longueur du gène (6ème colonne du fichier) / 1000    *   nombre total de reads de l'échantillon / 1e6

@@ -115,5 +115,5 @@ rule SJ_db:
 	shell: '''
 	awk 'BEGIN {{OFS="\t"; strChar[0]="."; strChar[1]="+"; strChar[2]="-";}} {{if($5>0){{print $1,$2,$3,strChar[$4]}}}}' \
 	 {input} > {output};
-	 mv {input} log/1st_pass/
+	 mv {input} logs/1st_pass/
 	'''

@@ -78,7 +78,7 @@ else:
 	rule pass2_SE:
 		input:
 			genome = "Reference/reference.fasta",
-			r = 'Trimming_AS/{sample}.trim.fastq.gz',
+			r = 'Trimming_AS/{sample}.trim.'+extension,
 			starRef = "genomeForPass2/chrName.txt"
 
 		output:

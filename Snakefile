@@ -17,6 +17,7 @@ else:
 	SAMPLES = list(set([ x.rstrip(extension) for x in FILES]))
 
 DIR_COMPARAISON = "DAS/"+config["design"]["condition_1"]+"_VS_"+config["design"]["condition_2"]
+
 ###
 
 
@@ -51,7 +52,6 @@ rule all:
 	input:
 		deg = "DEG/tair_ids.txt",
 		dtu = "DTU/DTU.txt",
-		das = "DAS/ColHS_VS_HMGA/topSplicingEvents/DAS.txt",
 		ref = "Reference/reference.fasta",
 		cse = "CSE_results/genes_to_states.txt"
 
