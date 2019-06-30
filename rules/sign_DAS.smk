@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import sys
 import re
@@ -31,6 +32,8 @@ rule rMATS_sig:
 
 	log:
 		"logs/sign_DAS/sign_DAS.log"
+
+	priority: 45
 
 	run:
 		for AS_EVENT in EVENTS:

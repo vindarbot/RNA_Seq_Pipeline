@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import sys
 import re
@@ -48,6 +49,8 @@ if config["design"]["paired"]:
 		log:
 			"logs/rMATS/rMATS.log"
 
+		priority: 50
+
 		message: ''' --- Second Trimming Step (for DASG)  --- '''
 
 		shell:'''
@@ -73,6 +76,8 @@ else:
 
 		log:
 			"logs/rMATS/rMATS.log"
+
+		priority: 50
 
 		message: ''' --- Second Trimming Step (for DASG)  --- '''
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 
 configfile: "config.yaml"

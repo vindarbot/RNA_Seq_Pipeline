@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 configfile: "config.yaml"
 
@@ -22,6 +23,8 @@ rule DESeq2:
 
 	log:
 		"logs/DESeq2/DESeq2.log"
+
+	priority: 70
 
 	message: ''' --- DEG analysis (DESeq2) --- '''
 

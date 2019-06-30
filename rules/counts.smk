@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 configfile: "config.yaml"
 
 if config["design"]["paired"]:
@@ -10,6 +11,8 @@ if config["design"]["paired"]:
 		output:
 			"featureCounts/counts.txt"
 
+		priority: 75
+
 		threads: 16
 
 		shell: ''' featureCounts -p -s 2 -T {threads} -t exon -g gene_id -a {input.gtf} -o {output} {input.mapping} '''
@@ -17,14 +20,14 @@ if config["design"]["paired"]:
 else:
 	rule featureCounts_SE:
 		input:
+			gtf = "Reference/reference.gtf",
 			mapping = expand("Mapping/{sample}.sorted.bam", sample=SAMPLES),
 			index = expand("Mapping/{sample}.sorted.bam.bai", sample=SAMPLES)
 
 		output:
 			"featureCounts/counts.txt"
 
-		params:
-			gtf = GTF
+		priority: 75
 
 		threads: 16
 

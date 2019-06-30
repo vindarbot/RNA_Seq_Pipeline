@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import sys
 import re
@@ -38,6 +39,8 @@ rule genomeForPass2:
 		read_length = config["DASG"]["cut_trim"] - 1
 
 	threads: 4
+
+	priority: 55
 
 	shell:' STAR --runThreadN {threads} --runMode genomeGenerate --sjdbOverhang {params.read_length} \
 	--genomeDir {params.genomedir} --genomeFastaFiles {input.genome} --sjdbFileChrStartEnd {input.SJ}'

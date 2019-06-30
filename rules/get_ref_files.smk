@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import sys
 import re
@@ -41,6 +42,8 @@ rule xpDesign: 		# Création d'un fichier txt qui décrit simplement le design e
 	output:
 		"experimentalDesign.txt"
 
+	priority: 100
+
 	run:
 		with open("experimentalDesign.txt","w") as xpDesign:
 			xpDesign.write("batch,condition\n")
@@ -81,6 +84,8 @@ rule get_reference_files:	# Règle qui récupère le génome de référence ains
 		get_transcripto = transcriptome,
 		transcripto_name = os.path.basename(transcriptome),
 		description_name = os.path.basename(description)
+
+	priority: 95
 
 	message: ''' --- downloading fasta and gtf files --- '''
 

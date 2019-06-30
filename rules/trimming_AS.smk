@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import sys
 import re
@@ -34,6 +35,8 @@ if config["design"]["paired"]:
 		log:
 			"logs/Trimming_AS/{sample}.log"
 
+		priority: 65
+
 		message: ''' --- Second Trimming Step (for DASG)  --- '''
 
 		shell: ' cutadapt -l {params.cut_trim} -m {params.cut_trim} -o {output.r1} -p {output.r2} {input.r1} {input.r2} -j 8 --pair-filter=any >{log} 2>&1'
@@ -52,6 +55,8 @@ else:
 
 		log:
 			"logs/Trimming_AS/{sample}.log"
+
+		priority: 65
 
 		message: ''' --- Second Trimming Step (for DASG) --- '''
 

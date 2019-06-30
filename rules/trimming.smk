@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 configfile: "config.yaml"
 
@@ -19,6 +20,8 @@ if config["design"]["paired"]:
 		log:
 			"logs/Trimming/{sample}.log"
 
+		priority: 90
+
 		message: ''' --- Trimming  --- '''
 
 		shell: ' bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
@@ -38,6 +41,8 @@ else:
 
 		log:
 			"logs/Trimming/{sample}.log"
+
+		priority: 90
 
 		message: ''' --- Trimming  --- '''
 

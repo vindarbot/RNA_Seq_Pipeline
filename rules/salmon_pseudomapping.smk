@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 
 configfile: 'config.yaml'
@@ -36,7 +37,8 @@ rule salmon_mapping:
 	input:
 		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
 		r2 = 'Trimming/{sample}_R2.trim.fastq.gz',
-		index = 'Salmon/index'
+		index = 'Salmon/index',
+		outindex = "Salmon/index/header.json"
 
 	output:
 		'Salmon/quants/{sample}/quant.sf'

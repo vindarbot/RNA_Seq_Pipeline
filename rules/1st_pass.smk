@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import sys
 import re
@@ -35,6 +36,8 @@ rule genomeForPass1:		# Indexation du génome de référence
 
 # 
 	threads: 8
+
+	priority: 60
 # 
 	message: ''' --- Indexation du génome de référence --- '''
 # 
