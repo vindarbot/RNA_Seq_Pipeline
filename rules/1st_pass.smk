@@ -21,7 +21,7 @@ if not os.path.exists('logs/1st_pass'):
 ###
 
 
-rule genomeForPass1:		# Indexation du génome de référence 
+rule genome_for_pass1:		# Indexation du génome de référence 
 	input:
 		genome = "Reference/reference.fasta",
 		gtf = "Reference/reference.gtf",

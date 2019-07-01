@@ -52,6 +52,7 @@ rule all:
 	input:
 		deg = "DEG/tair_ids.txt",
 		dtu = "DTU/DTU.txt",
+		das = "DAS/ColHS_VS_HMGA/topSplicingEvents/DAS.txt",
 		ref = "Reference/reference.fasta",
 		cse = "CSE_results/genes_to_states.txt"
 

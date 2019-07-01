@@ -38,7 +38,7 @@ for path in DIRS:
 		os.mkdir(path)
 
 
-rule xpDesign: 		# Création d'un fichier txt qui décrit simplement le design expérimental, ceci est nécessaire pour l'étape d'analyse des gènes différentiellement exprimés sous R
+rule experimental_design: 		# Création d'un fichier txt qui décrit simplement le design expérimental, ceci est nécessaire pour l'étape d'analyse des gènes différentiellement exprimés sous R
 	output:
 		"experimentalDesign.txt"
 

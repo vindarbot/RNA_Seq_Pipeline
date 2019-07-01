@@ -33,7 +33,7 @@ else:
 
 		shell: ''' featureCounts -T {threads} -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''	
 
-rule RPKM:
+rule FPKM:
 	input:
 		"featureCounts/counts.txt"
 

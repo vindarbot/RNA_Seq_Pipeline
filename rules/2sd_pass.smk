@@ -26,7 +26,7 @@ if not os.path.exists('logs/2sn_pass'):
 ###
 
 
-rule genomeForPass2:
+rule genome_for_pass2:
 	input:
 		genome = "Reference/reference.fasta",
 		SJ = "Reference/SJ.db"
