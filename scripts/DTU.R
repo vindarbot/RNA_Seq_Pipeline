@@ -1,8 +1,10 @@
 #BiocManager::install("docopt")
-#devtools::install_github("bartongroup/rats", ref="master")
 
 library(docopt)
+
+if (!require("rats")) devtools::install_github("bartongroup/rats", ref="master")
 library(rats)
+
 library(tidyverse)
 
 
