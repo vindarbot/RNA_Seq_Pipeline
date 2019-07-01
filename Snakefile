@@ -50,7 +50,6 @@ if config["CSE"]["exec"]:
 
 rule all:	
 	input:
-		bbmap = "scripts/BBMap/README.md",
 		featureCounts = "scripts/subread-1.6.1/README.txt",
 		deg = "DEG/tair_ids.txt",
 		dtu = "DTU/DTU.txt",
