@@ -21,7 +21,7 @@ DIR_COMPARAISON = "DAS/"+config["design"]["condition_1"]+"_VS_"+config["design"]
 ###
 
 
-
+include: "rules/get_packages.smk"
 include: "rules/get_ref_files.smk"
 
 if config["trimming"]["exec"]:
@@ -50,6 +50,8 @@ if config["CSE"]["exec"]:
 
 rule all:	
 	input:
+		bbmap = "scripts/BBMap/README.md",
+		featureCounts = "scripts/subread-1.6.1/README.txt",
 		deg = "DEG/tair_ids.txt",
 		dtu = "DTU/DTU.txt",
 		das = "DAS/ColHS_VS_HMGA/topSplicingEvents/DAS.txt",
