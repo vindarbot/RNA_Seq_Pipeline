@@ -17,7 +17,7 @@ ref_files:
   # roles,functions of genes (.txt)
   description : "https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/gene_description_20131231.txt.gz"
 
-  adapters : "/Users/vindarbo/happy_bin/bbmap/resources/adapters.fa"
+  adapters : "scripts/BBMap/resources/adapters.fa"
 
 
 design:
