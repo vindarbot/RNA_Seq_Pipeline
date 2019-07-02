@@ -9,6 +9,8 @@ configfile: "config.yaml"
 
 ### 
 
+extension = config["extension"]
+
 FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
 
 if config["design"]["paired"]:
@@ -53,7 +55,7 @@ rule all:
 		featureCounts = "scripts/subread-1.6.1/README.txt",
 		deg = "DEG/tair_ids.txt",
 		dtu = "DTU/DTU.txt",
-		das = "DAS/ColHS_VS_HMGA/topSplicingEvents/DAS.txt",
+		das = "DAS/Col_VS_HIRA/topSplicingEvents/DAS.txt",
 		ref = "Reference/reference.fasta",
 		cse = "CSE_results/genes_to_states.txt"
 

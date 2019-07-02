@@ -24,7 +24,7 @@ if config["design"]["paired"]:
 
 		message: ''' --- Trimming  --- '''
 
-		shell: ' bash scripts/BBMap/sh/bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
+		shell: ' bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
 			ref="{input.adapters}" minlen=25 ktrim=r k=22 qtrim=rl trimq=20 hdist=1 tpe tbo ziplevel=7 >{log} 2>&1'
 
 
@@ -34,7 +34,7 @@ else:
 		input:
 			xpDesign = 'experimentalDesign.txt',
 			adapters = config["ref_files"]["adapters"],
-			r = 'Experience/{sample}.'+config["extension"]
+			r = "Experience/{sample}.fastq.gz"
 
 		output:
 			r = 'Trimming/{sample}.trim.fastq.gz'
@@ -46,5 +46,5 @@ else:
 
 		message: ''' --- Trimming  --- '''
 
-		shell: ' bash scripts/BBMap/sh/bbduk.sh in="{input.r}" out="{output.r}" \
+		shell: ' bbduk.sh in="{input.r}" out="{output.r}" \
 			ref="{input.adapters}" minlen=25 ktrim=r k=22 qtrim=rl trimq=20 hdist=1 tpe tbo ziplevel=7 >{log} 2>&1 '

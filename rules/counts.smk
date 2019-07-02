@@ -31,7 +31,7 @@ else:
 
 		threads: 16
 
-		shell: ''' featureCounts -T {threads} -t exon -g gene_id -a {params.gtf} -o {output} {input.mapping} '''	
+		shell: ''' featureCounts -T {threads} -t exon -g gene_id -a {input.gtf} -o {output} {input.mapping} '''	
 
 rule FPKM:
 	input:
