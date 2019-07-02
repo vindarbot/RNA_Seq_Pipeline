@@ -8,7 +8,6 @@ channels:
   - defaults
 dependencies:
   - _r-mutex=1.0.0
-  - aioeasywebdav=2.4.0
   - aiohttp=3.5.4
   - appdirs=1.4.3
   - asn1crypto=0.24.0
@@ -42,15 +41,9 @@ dependencies:
   - ca-certificates=2019.5.15
   - cachetools=2.1.0
   - cairo=1.14.12
-  - cctools=895
   - certifi=2019.6.16
   - cffi=1.12.3
   - chardet=3.0.4
-  - clang=4.0.1
-  - clang_osx-64=4.0.1
-  - clangxx=4.0.1
-  - clangxx_osx-64=4.0.1
-  - compiler-rt=4.0.1
   - configargparse=0.14.0
   - cryptography=2.7
   - curl=7.64.1
@@ -68,7 +61,6 @@ dependencies:
   - ftputil=3.4
   - gettext=0.19.8.1
   - gffread=0.11.4
-  - gfortran_osx-64=4.8.5
   - gitdb2=2.0.5
   - gitpython=2.1.11
   - glib=2.56.2
@@ -91,15 +83,11 @@ dependencies:
   - jpeg=9b
   - jsonschema=3.0.1
   - krb5=1.16.1
-  - ld64=274.2
   - libboost=1.67.0
   - libcurl=7.64.1
-  - libcxx=4.0.1
-  - libcxxabi=4.0.1
   - libdeflate=1.0
   - libedit=3.1.20181209
   - libffi=3.2.1
-  - libgfortran=3.0.1
   - libiconv=1.15
   - libopenblas=0.3.6
   - libpng=1.6.37
@@ -108,9 +96,6 @@ dependencies:
   - libssh2=1.8.2
   - libtiff=4.0.10
   - libxml2=2.9.9
-  - llvm=4.0.1
-  - llvm-lto-tapi=4.0.1
-  - llvm-openmp=4.0.1
   - make=4.2.1
   - markupsafe=1.1.1
   - mkl=2019.4
