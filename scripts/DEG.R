@@ -22,8 +22,6 @@ outprefix <- opts[['outprefix']]
 description <- opts[['description']]
 
 library(DESeq2)
-library(GOstats)
-library(Category)
 library(tidyverse)
 library(biomaRt)
 library(ggplot2)

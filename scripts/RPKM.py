@@ -62,11 +62,6 @@ with open("DEG/RPKM.txt", "w") as RPKM:
 	for ligne in lignes[2:]:
 		RPKM.write(ligne.rstrip().split()[0]+"\t")
 		for sample in range(len(ligne.rstrip().split()[6:])):
-
-			print(int(ligne.rstrip().split()[6:][sample]))
-			print(' a')
-			print(((int(ligne.rstrip().split()[5]) / 1000)))
-			print('b')
 			
 			RPKM_value = int(ligne.rstrip().split()[6:][sample]) / ((int(ligne.rstrip().split()[5]) / 1000) * (int(sample_to_total_reads[sample])) / 1e6 )
 
