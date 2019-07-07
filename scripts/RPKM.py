@@ -3,7 +3,7 @@
 #############
 #
 #
-# Calcul du RPKM de chaque gène à partir d'un fichier de comptage généré par featuresCounts
+# Calcul du RPKM de chaque gene a partir d'un fichier de comptage genere par featuresCounts
 #
 # RPKM (reads per kilobase of exon model per million mapped reads) accounts for both library size
 # and gene length effects in within-sample comparisons
@@ -47,12 +47,14 @@ for ligne in lignes[2:]:
 # Ouverture du fichier qui va générer la matrice avec les valeurs de RPKM
 
 with open("DEG/RPKM.txt", "w") as RPKM:
-
+	RPKM.write('gene')
 	# Header du fichier avec le nom des échantillons
 	# On accède au nom des échantillons dans la 2ème ligne du fichier généré par featureCounts (lignes[1])
 	RPKM.write("\t")
 	for sample in lignes[1].rstrip().split()[6:]:
 		RPKM.write(sample+"\t")
+
+	RPKM.write('Mean_FPKM'+"\t")
 	RPKM.write("\n")
 
 
@@ -61,14 +63,24 @@ with open("DEG/RPKM.txt", "w") as RPKM:
 	#
 	for ligne in lignes[2:]:
 		RPKM.write(ligne.rstrip().split()[0]+"\t")
+
+		tot_RPKM = 0
 		for sample in range(len(ligne.rstrip().split()[6:])):
-			
+
 			RPKM_value = int(ligne.rstrip().split()[6:][sample]) / ((int(ligne.rstrip().split()[5]) / 1000) * (int(sample_to_total_reads[sample])) / 1e6 )
 
 			RPKM_value = round(RPKM_value,2)
 
+			tot_RPKM+= round(RPKM_value,2)
+
+
+
 			#        RPKM = nombre de reads compté pour un échantillon  /  longueur du gène (6ème colonne du fichier) / 1000    *   nombre total de reads de l'échantillon / 1e6
 			RPKM.write(str(RPKM_value)+"\t")
+
+		RPKM.write(str(tot_RPKM/len(ligne.rstrip().split()[6:]))+"\t")
+		tot_RPKM = 0
+
 		RPKM.write("\n")
 
 

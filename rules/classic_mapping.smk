@@ -20,7 +20,7 @@ rule indexation_genome:		# Indexation du génome de référence
 
 	priority: 85
 
-	threads: 16
+	threads: 8
 
 	message: ''' --- Indexation du génome de référence --- '''
 
@@ -28,6 +28,7 @@ rule indexation_genome:		# Indexation du génome de référence
 	--genomeDir {input.starref} \
 	--genomeFastaFiles {input.genome} \
 	--sjdbGTFfile {input.gtf} \
+	--genomeSAindexNbases 11 \
 	>{log} 2>&1'
 
 

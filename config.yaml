@@ -22,17 +22,17 @@ ref_files:
 
 design:
 
-  paired : False
+  paired : True
 
   #should be: fr-unstranded , fr-firststrand , fr-secondstrand or fr-unstranded
-  lib_type : fr-unstranded
+  lib_type : fr-firststrand
 
   read_length : 150
 
   # Name of the 2 conditions to analyse 
   condition_1 : "Col"
 
-  condition_2 : "HIRA"
+  condition_2 : "HMGA1"
 
 
 ### QC

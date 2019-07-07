@@ -54,6 +54,7 @@ rule all:
 	input:
 		featureCounts = "scripts/subread-1.6.1/README.txt",
 		deg = "DEG/tair_ids.txt",
+		trim = expand("Trimming/{sample}.trim.fastq.gz", sample = SAMPLES),
 		dtu = "DTU/DTU.txt",
 		das = "DAS/Col_VS_HIRA/topSplicingEvents/DAS.txt",
 		ref = "Reference/reference.fasta",
