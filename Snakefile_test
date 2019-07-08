@@ -25,8 +25,23 @@ DIR_COMPARAISON = "DAS/"+config["design"]["condition_1"]+"_VS_"+config["design"]
 
 rule all:
 	input:
+		xp = "experimentalDesign.txt",
 		trim = expand("Trimming/{sample}_R1.trim.fastq.gz", sample=SAMPLES)
 
+
+rule experimental_design: 		# Création d'un fichier txt qui décrit simplement le design expérimental, ceci est nécessaire pour l'étape d'analyse des gènes différentiellement exprimés sous R
+	output:
+		"experimentalDesign.txt"
+
+	priority: 100
+
+	run:
+		with open("experimentalDesign.txt","w") as xpDesign:
+			xpDesign.write("batch,condition\n")
+
+			for condition,samples in CONDITION_TO_SAMPLES.items():
+				for sample in samples:
+					xpDesign.write(sample+".sorted.bam,"+condition+"\n")
 
 rule trimming_PE: 		
 	input:
@@ -48,3 +63,5 @@ rule trimming_PE:
 
 	shell: ' bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
 		ref="{input.adapters}" minlen=25 ktrim=r k=22 qtrim=rl trimq=20 hdist=1 tpe tbo ziplevel=7 >{log} 2>&1'	
+
+

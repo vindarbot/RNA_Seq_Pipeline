@@ -1,12 +1,10 @@
-#BiocManager::install("docopt")
-
 library(docopt)
 
 if (!require("rats")) devtools::install_github("bartongroup/rats", ref="master")
 library(rats)
 
 library(tidyverse)
-library(wasabi)
+
 
 "Analyse des gènes différentiellement transcrits (RATs)
 Usage:

@@ -14,17 +14,15 @@ else:
 if not os.path.exists('logs/sign_DAS'):
 	os.mkdir('logs/sign_DAS')
 
-DIR_COMPARAISON = "DAS/"+config["design"]["condition_1"]+"_VS_"+config["design"]["condition_2"]
-
 EVENTS = glob.glob(DIR_COMPARAISON+"/rMATS_output/*MATS.JCEC.txt")
 
 
 rule rMATS_sig:
 	input:
-		DIR_COMPARAISON+"/rMATS_output/SE.MATS.JCEC.txt"
+		"DAS/rMATS_output/SE.MATS.JCEC.txt"
 
 	output:
-		DIR_COMPARAISON+"/topSplicingEvents/DAS.txt"
+		"DAS/DAS.txt"
 
 	params:
 		padj = config["DASG"]["pADJ"],

@@ -16,10 +16,8 @@ else:
 	SAMPLES = list(set([ x.rstrip(extension) for x in FILES]))
 
 
-DIR_COMPARAISON = "DAS/"+config["design"]["condition_1"]+"_VS_"+config["design"]["condition_2"]
-
-if not os.path.exists(DIR_COMPARAISON):
-	os.mkdir(DIR_COMPARAISON)
+if not os.path.exists("DAS/rMATS_output"):
+	os.mkdir("DAS/rMATS_output")
 
 if not os.path.exists('logs/rMATS'):
 	os.mkdir('logs/rMATS')
@@ -35,11 +33,11 @@ if config["design"]["paired"]:
 			starRef = "genomeForPass2/",
 			b1 = "b1.txt",
 			b2 = "b2.txt",
-			dir = DIR_COMPARAISON+"/rMATS_output"
+			dir = "DAS/rMATS_output"
 
 
 		output:
-			DIR_COMPARAISON+"/rMATS_output/SE.MATS.JCEC.txt"
+			"DAS/rMATS_output/SE.MATS.JCEC.txt"
 
 		params:
 			read_length = config["DASG"]["cut_trim"],
@@ -63,11 +61,11 @@ else:
 			starRef = "genomeForPass2/",
 			b1 = "b1.txt",
 			b2 = "b2.txt",
-			dir = DIR_COMPARAISON+"/rMATS_output"
+			dir = "DAS/rMATS_output"
 
 
 		output:
-			DIR_COMPARAISON+"/rMATS_output/SE.MATS.JCEC.txt"
+			"DAS/rMATS_output/SE.MATS.JCEC.txt"
 
 		params:
 			read_length = config["DASG"]["cut_trim"],
