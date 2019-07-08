@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import re
+import glob
+
+configfile: "config.yaml"
+
+### 
+
+extension = config["extension"]
+
+FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
+
+if config["design"]["paired"]:
+	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
+else:
+	SAMPLES = list(set([ x.rstrip(extension) for x in FILES]))
+
+DIR_COMPARAISON = "DAS/"+config["design"]["condition_1"]+"_VS_"+config["design"]["condition_2"]
+
+###
+
+
+rule all:
+	input:
+		trim = expand("Trimming/{sample}_R1.trim.fastq.gz", sample=SAMPLES)
+
+
+rule trimming_PE: 		
+	input:
+		xpDesign = 'experimentalDesign.txt',
+		adapters = config["ref_files"]["adapters"],
+		r1 = 'Experience/{sample}_R1.'+config["extension"],
+		r2 = 'Experience/{sample}_R2.'+config["extension"]
+
+	output:
+		r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
+		r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+
+	log:
+		"logs/Trimming/{sample}.log"
+
+	priority: 90
+
+	message: ''' --- Trimming  --- '''
+
+	shell: ' bbduk.sh in1="{input.r1}" in2="{input.r2}" out1="{output.r1}" out2="{output.r2}" \
+		ref="{input.adapters}" minlen=25 ktrim=r k=22 qtrim=rl trimq=20 hdist=1 tpe tbo ziplevel=7 >{log} 2>&1'	

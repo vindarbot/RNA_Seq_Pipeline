@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 configfile: "config.yaml"
 
+FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
+
+if config["design"]["paired"]:
+	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
+else:
+	SAMPLES = list(set([ x.rstrip(extension) for x in FILES]))
+
 if config["design"]["paired"]:
 	rule featureCounts_PE:
 		input:
