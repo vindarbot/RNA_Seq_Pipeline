@@ -51,7 +51,7 @@ if config["design"]["paired"]:
 			outdir = 'Salmon/quants/{sample}'
 
 		shell:
-			" salmon quant -l A --index {input.index} -1 {input.r1} -2 {input.r2} -o {params.outdir} --validateMappings --numBootstraps {params.boots}"
+			" salmon quant -l A --index {input.index} -1 {input.r1} -2 {input.r2} -o {params.outdir} --validateMappings --numBootstraps {params.boots} --writeMappings"
 
 else:
 	rule salmon_mapping_SE:
@@ -68,7 +68,7 @@ else:
 			outdir = 'Salmon/quants/{sample}'
 
 		shell:
-			" salmon quant -l A --index {input.index} -r {input.r} -o {params.outdir} --validateMappings --numBootstraps {params.boots}"
+			" salmon quant -l A --index {input.index} -r {input.r} -o {params.outdir} --validateMappings --numBootstraps {params.boots} --writeMappings"
 
 
 
