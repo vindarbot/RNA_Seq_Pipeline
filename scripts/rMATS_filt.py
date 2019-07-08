@@ -3,6 +3,7 @@
 import sys
 import os
 import argparse
+import glob
 ### 
 # Script qui prend en entrée un fichier de sortie de rMATS pour un évenèment de splicing donné, et ressort
 # les évènement différentiellement exprimés entre les deux conditions.
@@ -23,63 +24,62 @@ parser.add_argument("-p","--padj",action='store',
 parser.add_argument("-c","--psi", action='store', 
 	help="PSI cutoff")
 
-parser.add_argument("-e","--event", action='store', 
-	help="path to AS event to analyse")
-
 args = parser.parse_args()
 
-PSI = args.psi
+PSI = float(args.psi)
 padj = args.padj
-event= args.event
 
-rMATs_file = open(event,"r")
-
-file_name = os.path.basename(event).rstrip(".txt")
-
-dirName = "/".join(os.path.dirname(event).split("/")[0:2])
 
 columnsToKeep = [0,1,3,4,5,6,7,8,9,10,12,13,14,15,19,22]
 
+EVENTS = glob.glob("DAS/rMATS_output/*MATS.JCEC.txt")
 
+for event in EVENTS:
 
-with open("DAS/topSplicingEvents/"+file_name+".top.txt","w") as rMATSs_top_file:
+	rMATs_file = open(event,"r")
 
-	for ligne in rMATs_file.readlines():
+	file_name = os.path.basename(event).rstrip(".txt")
 
-		if ligne.startswith("ID"):
+	with open("DAS/topSplicingEvents/"+file_name+".top.txt","w") as rMATSs_top_file:
 
-			for i in columnsToKeep:
+		for ligne in rMATs_file.readlines():
 
-				rMATSs_top_file.write(ligne.split()[i]+"\t")
-			rMATSs_top_file.write("\n")
+			if ligne.startswith("ID"):
 
-
-
-		else:
-			# On compte le nombre total de reads dans les 2 conditions (ligne.split()[12,13] pour accéeder aux nombre de reads des)
-			# échantillons de la condition 1, et ligne.split()[14,15] pour accéder aux reads de la condition 2
-			nbTotalReads = sum(list(map(int, ligne.split()[12].split(","))))+sum(list(map(int, ligne.split()[14].split(","))))+sum(list(map(int, ligne.split()[13].split(","))))+sum(list(map(int, ligne.split()[15].split(","))))
-
-			# On compte le nombre d'échantillon , par exemple dans la colonne 12, si on a 3 échantillons on aura cette valeur la:
-			# 12,14,8
-			# Ainsi, en splittant la ligne par (",") et en comptant le nombre d'éléments obtenus, on a accès au nombre d'échantillons
-			# On somme pour les 2 colonnes associés aux 2 conditions.
-			nbSamples = len(ligne.split()[12].split(","))+len(ligne.split()[14].split(","))
-
-			avgNbReads = nbTotalReads / nbSamples
-
-
-
-			if avgNbReads > 1  and abs(float(ligne.split()[22])) > float(PSI) :
-
-				print(abs(float(ligne.split()[22])))
 				for i in columnsToKeep:
 
 					rMATSs_top_file.write(ligne.split()[i]+"\t")
-
 				rMATSs_top_file.write("\n")
 
-rMATs_file.close()
+
+
+			else:
+				# On compte le nombre total de reads dans les 2 conditions (ligne.split()[12,13] pour accéeder aux nombre de reads des)
+				# échantillons de la condition 1, et ligne.split()[14,15] pour accéder aux reads de la condition 2
+				nbTotalReads = sum(list(map(int, ligne.split()[12].split(","))))+sum(list(map(int, ligne.split()[14].split(","))))+sum(list(map(int, ligne.split()[13].split(","))))+sum(list(map(int, ligne.split()[15].split(","))))
+
+				# On compte le nombre d'échantillon , par exemple dans la colonne 12, si on a 3 échantillons on aura cette valeur la:
+				# 12,14,8
+				# Ainsi, en splittant la ligne par (",") et en comptant le nombre d'éléments obtenus, on a accès au nombre d'échantillons
+				# On somme pour les 2 colonnes associés aux 2 conditiosns.
+				nbSamples = len(ligne.split()[12].split(","))+len(ligne.split()[14].split(","))
+
+				avgNbReads = nbTotalReads / nbSamples
+
+
+				try:
+					if avgNbReads > 10  and abs(float(ligne.split()[22])) > PSI :
+
+						print(abs(float(ligne.split()[22])))
+						for i in columnsToKeep:
+
+							rMATSs_top_file.write(ligne.split()[i]+"\t")
+
+						rMATSs_top_file.write("\n")
+				except:
+					break
+
+	rMATs_file.close()
 
 
 if len(os.listdir("DAS/topSplicingEvents")) == 5:

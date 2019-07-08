@@ -33,6 +33,5 @@ rule rMATS_sig:
 
 	priority: 45
 
-	run:
-		for AS_EVENT in EVENTS:
-			os.system("python3 scripts/rMATS_filt.py -p {params.padj} -c {params.psi} -e "+AS_EVENT+" >{log} 2>&1")
+	shell:
+		"python3 scripts/rMATS_filt.py -p {params.padj} -c {params.psi} >{log} 2>&1"
