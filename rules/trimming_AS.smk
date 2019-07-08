@@ -9,9 +9,7 @@ configfile: "config.yaml"
 CONDITION1 = config["design"]["condition_1"]
 CONDITION2 = config["design"]["condition_2"]
 
-DIR_COMPARAISON = "DAS/"+CONDITION1+"_VS_"+CONDITION2
-
-DIRS = ['Reference/star_1stpass','Trimming_AS','DAS','pass1','genomeForPass2','pass2',"DAS",DIR_COMPARAISON,DIR_COMPARAISON+"/rMATS_output/",DIR_COMPARAISON+"/topSplicingEvents","logs/Trimming_AS"]
+DIRS = ['Reference/star_1stpass','Trimming_AS','DAS','pass1','genomeForPass2','pass2',"DAS","DAS/rMATS_output/","DAS/topSplicingEvents","logs/Trimming_AS"]
 
 for path in DIRS:
 	if not os.path.exists(path):

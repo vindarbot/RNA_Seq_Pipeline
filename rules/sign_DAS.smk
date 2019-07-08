@@ -14,7 +14,7 @@ else:
 if not os.path.exists('logs/sign_DAS'):
 	os.mkdir('logs/sign_DAS')
 
-EVENTS = glob.glob(DIR_COMPARAISON+"/rMATS_output/*MATS.JCEC.txt")
+EVENTS = glob.glob("DAS/rMATS_output/*MATS.JCEC.txt")
 
 
 rule rMATS_sig:

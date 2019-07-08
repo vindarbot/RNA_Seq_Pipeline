@@ -37,12 +37,12 @@ rMATs_file = open(event,"r")
 file_name = os.path.basename(event).rstrip(".txt")
 
 dirName = "/".join(os.path.dirname(event).split("/")[0:2])
-print(dirName)
+
 columnsToKeep = [0,1,3,4,5,6,7,8,9,10,12,13,14,15,19,22]
 
 
 
-with open(dirName+"/topSplicingEvents/"+file_name+".top.txt","w") as rMATSs_top_file:
+with open("DAS/topSplicingEvents/"+file_name+".top.txt","w") as rMATSs_top_file:
 
 	for ligne in rMATs_file.readlines():
 
@@ -70,7 +70,7 @@ with open(dirName+"/topSplicingEvents/"+file_name+".top.txt","w") as rMATSs_top_
 
 
 
-			if avgNbReads > 10  and abs(float(ligne.split()[22])) > float(PSI) :
+			if avgNbReads > 1  and abs(float(ligne.split()[22])) > float(PSI) :
 
 				print(abs(float(ligne.split()[22])))
 				for i in columnsToKeep:
@@ -81,14 +81,14 @@ with open(dirName+"/topSplicingEvents/"+file_name+".top.txt","w") as rMATSs_top_
 
 rMATs_file.close()
 
-print(len(os.listdir(dirName+"/topSplicingEvents")))
-if len(os.listdir(dirName+"/topSplicingEvents")) == 5:
+
+if len(os.listdir("DAS/topSplicingEvents")) == 5:
 
 	liste_DAS = []
 
-	for file in os.listdir(dirName+"/topSplicingEvents"):
+	for file in os.listdir("DAS/topSplicingEvents"):
 
-		with open(dirName+"/topSplicingEvents/"+file,"r") as file:
+		with open("DAS/topSplicingEvents/"+file,"r") as file:
 
 			for ligne in file.readlines():
 
@@ -99,7 +99,7 @@ if len(os.listdir(dirName+"/topSplicingEvents")) == 5:
 	liste_unique_DAS = list(set(liste_DAS))
 
 
-	with open(dirName+"/topSplicingEvents/DAS.txt","w") as DAS:
+	with open("DAS/DAS.txt","w") as DAS:
 		for gene in liste_unique_DAS:
 			DAS.write(gene+"\n")
 

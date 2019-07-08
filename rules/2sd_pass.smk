@@ -17,7 +17,7 @@ else:
 
 CONDITION1 = config["design"]["condition_1"]
 
-DIR_COMPARAISON = "DAS/"+CONDITION1+"_VS_"+CONDITION2
+# DIR_COMPARAISON = "DAS/"+CONDITION1+"_VS_"+CONDITION2
 
 
 if not os.path.exists('logs/2sn_pass'):
