@@ -67,7 +67,8 @@ if config["design"]["paired"]:
 		threads: 4
 
 		shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
-	 		--alignIntronMax 299999 \
+			--alignIntronMin 20 \
+	 		--alignIntronMax 1000000 \
 	 		--genomeDir {params.direct} \
 	 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r1} {input.r2} \
 	 		--sjdbOverhang  {params.read_length} --readFilesCommand "gunzip -c" \

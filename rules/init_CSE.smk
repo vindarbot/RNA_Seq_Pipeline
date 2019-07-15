@@ -30,3 +30,17 @@ rule run_CSE:
 	shell:
 		'python3 CHROMATINE-STATES/python/fisher_chrState.py -l {input.liste_deg} -o {params.dir} -p {params.padj}; \
 		ln -s {params.dir_html} CSE_results/results.html'
+
+rule format_DEG_CSE_results:
+	input:
+		up = 'DEG/genes_up.txt',
+		down = 'DEG/genes_down.txt',
+		FPKM = 'DEG/RPKM.txt',
+		gene_to_states = "CHROMATINE-STATES/genes_to_states.txt"
+
+	output:
+		up = "CSE_results/CSE_DEG_UP.txt",
+		down = "CSE_results/CSE_DEG_DOWN.txt"
+
+	shell: '''python3 scripts/generate_results.py {input.up} {output.up};
+		python3 scripts/generate_results.py {input.down} {output.down} '''

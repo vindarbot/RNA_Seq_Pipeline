@@ -1,3 +1,4 @@
+
 library(docopt)
 
 if (!require("rats")) devtools::install_github("bartongroup/rats", ref="master")

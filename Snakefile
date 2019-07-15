@@ -58,7 +58,8 @@ rule all:
 		dtu = "DTU/DTU.txt",
 		das = "DAS/DAS.txt",
 		ref = "Reference/reference.fasta",
-		cse = "CSE_results/genes_to_states.txt"
+		cse = "CSE_results/genes_to_states.txt",
+		deg_cse = "CSE_results/CSE_DEG_UP.txt"
 
 
 		
