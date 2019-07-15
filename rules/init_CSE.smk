@@ -36,7 +36,7 @@ rule format_DEG_CSE_results:
 		up = 'DEG/genes_up.txt',
 		down = 'DEG/genes_down.txt',
 		FPKM = 'DEG/RPKM.txt',
-		gene_to_states = "CHROMATINE-STATES/genes_to_states.txt"
+		gene_to_states = "CSE_results/genes_to_states.txt"
 
 	output:
 		up = "CSE_results/CSE_DEG_UP.txt",

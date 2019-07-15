@@ -20,7 +20,7 @@ file1 = open(sys.argv[1],"r")
 
 file2 = open("DEG/RPKM.txt","r")
 
-file3 = open("CHROMATINE-STATES/genes_to_states.txt",'r')
+file3 = open("CSE_results/genes_to_states.txt",'r')
 
 
 up = file1.readlines()
