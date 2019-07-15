@@ -67,16 +67,24 @@ new_file.append(header)
 
 for ligne in up[1:]:
 
-	if ligne.startswith('tair_locus'):
-		print(ligne)
-		new_file.append(ligne.split('\t'))
+
+
 	
 
-	elif ligne.split()[0].rstrip() in RPKM_to_join:
+	if ligne.split()[0].rstrip() in RPKM_to_join:
 
 
-		full_RPKM = ligne.rstrip().split('\t')
-		full_RPKM.append(RPKM_to_join[ligne.split('\t')[0].rstrip()])
+		if ligne.split('\t')[4] == "\n":
+
+			full_RPKM = [ligne.split('\t')[0],ligne.split('\t')[1],ligne.split('\t')[2],ligne.split('\t')[3],"NA"]
+
+			full_RPKM.append(RPKM_to_join[ligne.split('\t')[0].rstrip()])
+		else:
+
+			full_RPKM = ligne.rstrip().split('\t')
+		
+
+			full_RPKM.append(RPKM_to_join[ligne.split('\t')[0].rstrip()])
 
 		if ligne.split()[0].rstrip() in formate_states:
 
@@ -103,10 +111,10 @@ for ligne in new_file:
 	write_file.write("\n")
 
 
-# for ligne in up:
-# 	if ligne.split()[0].rstrip() in formate_states:
-# 		i+=1
-# 		print(i)
+# # for ligne in up:
+# # 	if ligne.split()[0].rstrip() in formate_states:
+# # 		i+=1
+# # 		print(i)
 
 
 
