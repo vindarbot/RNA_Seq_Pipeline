@@ -11,32 +11,52 @@ configfile: "config.yaml"
 
 extension = config["extension"]
 
-FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
+if config["trimming"]["exec"]:
+	FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
+
+else:
+	FILES = [ os.path.basename(x) for x in glob.glob("Trimming/*") ]
+
+	FILES = [ file.replace('.trim','') for file in FILES]
+
+	for file in FILES:
+		os.system('touch Experience/'+file)
+
 
 if config["design"]["paired"]:
 	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
 else:
 	SAMPLES = list(set([ x.rstrip(extension) for x in FILES]))
 
-DIR_COMPARAISON = "DAS/"+config["design"]["condition_1"]+"_VS_"+config["design"]["condition_2"]
 
 ###
 
 def get_input(wildcards):
 	input_list = ["Reference/reference.fasta"]
 
-	for fq in expand("Trimming/{sample}_R1.trim.fastq.gz", sample=SAMPLES):
-		input_list.append(fq)
+	if config["design"]["paired"]:
+		for fq in expand("Trimming/{sample}_R1.trim.fastq.gz", sample=SAMPLES):
+			input_list.append(fq)
+	else:
+		for fq in expand("Trimming/{sample}.trim.fastq.gz", sample=SAMPLES):
+			input_list.append(fq)
 
 	if config["DEG"]["exec"]:
 		input_list.append("DEG/tair_ids.txt")
-		
+
 	if config["DTU"]["exec"]:
 		input_list.append("DTU/DTU.txt")
 
 	if config["DASG"]["exec"]:
-		for fq_AS in expand("Trimming_AS/{sample}_R1.trim.fastq.gz", sample=SAMPLES):
-			input_list.append(fq_AS)
+
+		if config["design"]["paired"]:
+			for fq_AS in expand("Trimming_AS/{sample}_R1.trim.fastq.gz", sample=SAMPLES):
+				input_list.append(fq_AS)
+
+		else:
+			for fq_AS in expand("Trimming_AS/{sample}.trim.fastq.gz", sample=SAMPLES):
+				input_list.append(fq_AS)
+
 		input_list.append("DAS/DAS.txt")
 
 	if config["CSE"]["exec"]:
