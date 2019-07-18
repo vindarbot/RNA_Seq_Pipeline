@@ -45,7 +45,7 @@ trimming:
 
 DEG : 
 
-  exec : True
+  exec : False
 
   pADJ : 0.05
 
@@ -63,7 +63,7 @@ DTU :
 
 DASG :
 
-  exec : True
+  exec : False
 
   pADJ : 0.05
 
@@ -81,10 +81,10 @@ DASG :
 # Chromatine State Enrichment (CSE):
 CSE:
 
+  exec : False
+
   # !!! indicate path to the file of list of DEG only if the DEG analysis is not run executed 
   path_list_deg_name : '../../DEG_12_SAMPLES/id_mutation.txt'
-
-  exec : False
 
   pADJ : 0.01
   

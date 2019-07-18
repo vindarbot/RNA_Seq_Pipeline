@@ -30,10 +30,15 @@ def get_input(wildcards):
 
 	if config["DEG"]["exec"]:
 		input_list.append("DEG/tair_ids.txt")
+		
 	if config["DTU"]["exec"]:
 		input_list.append("DTU/DTU.txt")
+
 	if config["DASG"]["exec"]:
+		for fq_AS in expand("Trimming_AS/{sample}_R1.trim.fastq.gz", sample=SAMPLES):
+			input_list.append(fq_AS)
 		input_list.append("DAS/DAS.txt")
+
 	if config["CSE"]["exec"]:
 		input_list.append("CSE_results/CSE_DEG_UP.txt")
 
