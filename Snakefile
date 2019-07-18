@@ -22,6 +22,23 @@ DIR_COMPARAISON = "DAS/"+config["design"]["condition_1"]+"_VS_"+config["design"]
 
 ###
 
+def get_input(wildcards):
+	input_list = ["Reference/reference.fasta"]
+
+	for fq in expand("Trimming/{sample}_R1.trim.fastq.gz", sample=SAMPLES):
+		input_list.append(fq)
+
+	if config["DEG"]["exec"]:
+		input_list.append("DEG/tair_ids.txt")
+	if config["DTU"]["exec"]:
+		input_list.append("DTU/DTU.txt")
+	if config["DASG"]["exec"]:
+		input_list.append("DAS/DAS.txt")
+	if config["CSE"]["exec"]:
+		input_list.append("CSE_results/CSE_DEG_UP.txt")
+
+	return input_list
+
 
 include: "rules/get_packages.smk"
 include: "rules/get_ref_files.smk"
@@ -33,6 +50,8 @@ if config["DEG"]["exec"]:
 	include: "rules/classic_mapping.smk"
 	include: "rules/counts.smk"
 	include: "rules/run_DESeq2.smk"
+
+
 
 if config["DASG"]["exec"]:
 	include: "rules/trimming_AS.smk"
@@ -49,17 +68,9 @@ if config["CSE"]["exec"]:
 	include: "rules/init_CSE.smk"
 	
 
-
 rule all:	
 	input:
-		featureCounts = "scripts/subread-1.6.1/README.txt",
-		deg = "DEG/tair_ids.txt",
-		trim = expand("Trimming/{sample}_R1.trim.fastq.gz", sample=SAMPLES),
-		dtu = "DTU/DTU.txt",
-		das = "DAS/DAS.txt",
-		ref = "Reference/reference.fasta",
-		cse = "CSE_results/genes_to_states.txt",
-		deg_cse = "CSE_results/CSE_DEG_UP.txt"
+		get_input
 
 
 		

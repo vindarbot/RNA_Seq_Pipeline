@@ -82,9 +82,9 @@ DASG :
 CSE:
 
   # !!! indicate path to the file of list of DEG only if the DEG analysis is not run executed 
-  path_list_deg_name : 'DEG/tair_ids.txt'
+  path_list_deg_name : '../../DEG_12_SAMPLES/id_mutation.txt'
 
-  exec : True
+  exec : False
 
   pADJ : 0.01
   
