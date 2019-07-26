@@ -3,19 +3,20 @@
 If it isn't install, please download Miniconda latest-version here (https://docs.conda.io/en/latest/miniconda.html)
 
 After that, download the RNA_Seq_Pipeline project:
-git clone https://github.com/Darbinator/RNA_Seq_Pipeline.git
+> git clone https://github.com/Darbinator/RNA_Seq_Pipeline.git
 
-And go in the repository " cd RNA_Seq_Pipeline "
+And go in the repository 
+> cd RNA_Seq_Pipeline 
 
 To create the environment to run the analysis:
 
 on macx OS:
-conda env create -f envs/macos.yml
-conda activate macos
+> conda env create -f envs/macos.yml
+> conda activate macos
 
 on Linux:
-conda env create -f envs/linux.yml
-conda activate linux
+> conda env create -f envs/linux.yml
+> conda activate linux
 
 ## Configure the experimental design of the analysis, and which parts of the analysis to execute
 
