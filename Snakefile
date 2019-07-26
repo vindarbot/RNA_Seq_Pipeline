@@ -46,6 +46,8 @@ def get_input(wildcards):
 
 	if config["DTU"]["exec"]:
 		input_list.append("DTU/DTU.txt")
+		for quant in expand('Salmon/quants/{sample}/quant.sf', sample=SAMPLES):
+			input_list.append(quant)
 
 	if config["DASG"]["exec"]:
 
