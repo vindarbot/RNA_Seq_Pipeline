@@ -12,10 +12,16 @@ To create the environment to run the analysis:
 
 on macx OS:
 > conda env create -f envs/macos.yml
+
 > conda activate macos
+
+Also for macos, please install gawk:
+
+> brew install gawk
 
 on Linux:
 > conda env create -f envs/linux.yml
+
 > conda activate linux
 
 ## Configure the experimental design of the analysis, and which parts of the analysis to execute
