@@ -1,3 +1,4 @@
+if (!require("BiocManager")) install.packages("BiocManager")
 if (!require("docopt")) BiocManager::install("docopt")
 library(docopt)
 
