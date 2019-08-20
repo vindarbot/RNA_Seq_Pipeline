@@ -1,4 +1,4 @@
-#BiocManager::install("docopt")
+if (!require("docopt")) BiocManager::install("docopt")
 library(docopt)
 
 "Analyse des gènes différentiellement exprimés (DESeq2)
