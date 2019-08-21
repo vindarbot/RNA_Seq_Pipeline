@@ -1,6 +1,6 @@
 
 library(docopt)
-
+#if (!require("devtools")) install.packages("devtools", repos="http://cran.us.r-project.org")
 if (!require("rats")) devtools::install_github("bartongroup/rats", ref="master")
 library(rats)
 
