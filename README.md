@@ -51,7 +51,7 @@ If you want to only perform CSE analysis, please download the tool individually 
 #### - Experience/ 
 
 This folder must include all raw files (.fastq format) for the analysis. The nomenclature to use for the files name is as follows:
- - paired-ends reads: {nameOfCondition}_{n°ofReplicate}_R1.fastq.gz, {nameOfCondition}_{n°ofReplicate}_R2.fastq.gz
+ - paired-ends reads: {nameOfCondition}__{n°ofReplicate}__R1.fastq.gz, {nameOfCondition}_{n°ofReplicate}_R2.fastq.gz
  - single-ends reads: {nameOfCondition}_{n°ofReplicate}.fastq.gz
 
 For exemple, for paired-ends reads from two conditions with two replicates:
