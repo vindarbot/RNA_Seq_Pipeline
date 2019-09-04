@@ -54,7 +54,7 @@ if config["design"]["paired"]:
 			"logs/Salmon/quants_{sample}.log"
 
 		shell:
-			" salmon quant -l A --index {input.index} -1 {input.r1} -2 {input.r2} -o {params.outdir} --validateMappings --numBootstraps {params.boots} --writeMappings={params.outdir}/out.sam >>{log} 2>&1"
+			" salmon quant -l A --index {input.index} -1 {input.r1} -2 {input.r2} -o {params.outdir} --numBootstraps {params.boots} --writeMappings={params.outdir}/out.sam >>{log} 2>&1"
 
 else:
 	rule salmon_mapping_SE:
@@ -74,7 +74,7 @@ else:
 			"logs/Salmon/quants_{sample}.log"
 
 		shell:
-			" salmon quant -l A --index {input.index} -r {input.r} -o {params.outdir} --validateMappings --numBootstraps {params.boots} --writeMappings={params.outdir}/out.sam >>{log} 2>&1"
+			" salmon quant -l A --index {input.index} -r {input.r} -o {params.outdir} --numBootstraps {params.boots} --writeMappings={params.outdir}/out.sam >>{log} 2>&1"
 
 
 
