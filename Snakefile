@@ -26,7 +26,8 @@ else:
 if config["design"]["paired"]:
 	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
 else:
-	SAMPLES = list(set([ x.rstrip(extension) for x in FILES]))
+	SAMPLES = list(set([ x.rstrip('.'+extension) for x in FILES]))
+
 
 
 ###
@@ -35,10 +36,10 @@ def get_input(wildcards):
 	input_list = ["Reference/reference.fasta"]
 
 	if config["design"]["paired"]:
-		for fq in expand("Trimming/{sample}_R1.trim.fastq.gz", sample=SAMPLES):
+		for fq in expand("Trimming/{sample}_R1.trim."+extension, sample=SAMPLES):
 			input_list.append(fq)
 	else:
-		for fq in expand("Trimming/{sample}.trim.fastq.gz", sample=SAMPLES):
+		for fq in expand("Trimming/{sample}.trim."+extension, sample=SAMPLES):
 			input_list.append(fq)
 
 	if config["DEG"]["exec"]:
@@ -52,11 +53,11 @@ def get_input(wildcards):
 	if config["DASG"]["exec"]:
 
 		if config["design"]["paired"]:
-			for fq_AS in expand("Trimming_AS/{sample}_R1.trim.fastq.gz", sample=SAMPLES):
+			for fq_AS in expand("Trimming_AS/{sample}_R1.trim."+extension, sample=SAMPLES):
 				input_list.append(fq_AS)
 
 		else:
-			for fq_AS in expand("Trimming_AS/{sample}.trim.fastq.gz", sample=SAMPLES):
+			for fq_AS in expand("Trimming_AS/{sample}.trim."+extension, sample=SAMPLES):
 				input_list.append(fq_AS)
 
 		input_list.append("DAS/DAS.txt")

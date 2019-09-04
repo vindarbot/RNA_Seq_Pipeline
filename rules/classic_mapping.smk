@@ -37,8 +37,8 @@ if config["design"]["paired"]:
 		input:
 			index = "Reference/star/chrName.txt",
 			starref = 'Reference/star/',
-			r1 = 'Trimming/{sample}_R1.trim.fastq.gz',
-			r2 = 'Trimming/{sample}_R2.trim.fastq.gz'
+			r1 = 'Trimming/{sample}_R1.trim.'+config["extension"],
+			r2 = 'Trimming/{sample}_R2.trim.'+config["extension"]
 
 		output:
 			"Mapping/{sample}.bam"
@@ -63,7 +63,7 @@ else:
 		input:
 			index = "Reference/star/chrName.txt",
 			starref = 'Reference/star/',
-			r = 'Trimming/{sample}.trim.fastq.gz'
+			r = 'Trimming/{sample}.trim.'+config["extension"]
 
 		output:
 			"Mapping/{sample}.bam"
@@ -101,3 +101,5 @@ rule index_bam:
 		"Mapping/{sample}.sorted.bam.bai"
 
 	shell: ''' samtools index {input} > {output} '''
+
+	
