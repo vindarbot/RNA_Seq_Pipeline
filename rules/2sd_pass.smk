@@ -93,7 +93,7 @@ else:
 		threads: 4
 
 		shell:' STAR --runThreadN {threads} --chimSegmentMin 2 --outFilterMismatchNmax 3\
-	 		--alignIntronMax 299999 \
+	 		--alignIntronMax 2999999 \
 	 		--genomeDir {params.direct} \
 	 		--outFileNamePrefix pass2/{wildcards.sample} --readFilesIn {input.r} \
 	 		--sjdbOverhang  {params.read_length} --readFilesCommand "gunzip -c" \
