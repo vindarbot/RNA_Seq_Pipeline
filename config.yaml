@@ -54,7 +54,7 @@ DEG :
 
 DTU :
 
-  exec : False
+  exec : True
 
   pADJ : 0.05
 
@@ -63,7 +63,7 @@ DTU :
 
 DASG :
 
-  exec : False
+  exec : True
 
   pADJ : 0.05
 

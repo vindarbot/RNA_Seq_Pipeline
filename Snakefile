@@ -25,6 +25,7 @@ else:
 
 if config["design"]["paired"]:
 	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
+
 else:
 	SAMPLES = list(set([ x.rstrip('.'+extension) for x in FILES]))
 
@@ -100,7 +101,15 @@ rule all:
 	input:
 		get_input
 
+print("Experimental design :\n")
+for param in config["design"]:
+	print(str(param)+" : "+str(config["design"][param]))
 
 		
+for analyse in ["trimming","DEG","DTU","DASG","CSE"]:
+	if config[analyse]["exec"] == True:
+		print("params for "+str(analyse)+" :\n")
+		for param in config[analyse]:
+			print(str(param)+" : "+str(config[analyse][param]))
 
 		

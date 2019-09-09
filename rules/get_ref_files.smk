@@ -22,7 +22,7 @@ if config["design"]["paired"]:
 else:
 
 	SAMPLES = list(set([ x.rstrip('.'+extension) for x in FILES]))
-	print(SAMPLES)
+
 	
 
 CONDITIONS = list(set(x.split("_")[0] for x in SAMPLES))
@@ -32,7 +32,7 @@ CONDITION_TO_SAMPLES = {}
 for condition in CONDITIONS:
 	CONDITION_TO_SAMPLES[condition] = [sample for sample in SAMPLES if sample.split("_")[0] == condition]
 
-print(CONDITION_TO_SAMPLES)
+
 
 DIRS = ['Reference','Reference/star/','Mapping','Mapping/Out','Trimming','featureCounts','DEG','logs']
 
