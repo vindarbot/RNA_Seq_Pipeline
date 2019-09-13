@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+
+# Lance l'analyse avec DESEQ2, voir scripts/DEG.R
 import os
 configfile: "config.yaml"
 

@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import os
 
+# Fichier qui permet d'abord de telecharger le projet ChromatnStateEnrichment via github
+# Ensuite de lancer l'analyse a partir de la liste des gènes dérégulés lors de l'analyse differentielle a l'echelle des genes
+# Enfin, creation d'un fichier de sortie qui resume  l'ensemble de l'analyse d'expression a l'echelle des genes.
 configfile: "config.yaml"
 
 DIR = os.getcwd()

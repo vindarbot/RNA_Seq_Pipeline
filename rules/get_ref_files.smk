@@ -8,12 +8,16 @@ configfile: "config.yaml"
 
 RAWDATA_DIR = os.getcwd()
 
+# Recuperer le nom des fichiers dans le dossier Experience 
+
 FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
 
 wildcards = glob_wildcards('Experience/{fq_files}')
 
 extension = [filename.split('.',1)[1] for filename in wildcards.fq_files][0]
 
+# Recupere le nom des echantillons selon si l'experience est en paired-end ou non.
+# Exemple de nom d'echantillon : Col_1
 
 if config["design"]["paired"]:
 
@@ -24,9 +28,10 @@ else:
 	SAMPLES = list(set([ x.rstrip('.'+extension) for x in FILES]))
 
 	
-
+# Nom des conditions, a partir des noms d'echantillons. example : Col
 CONDITIONS = list(set(x.split("_")[0] for x in SAMPLES))
 
+# Dictionnaire qui associe chaque echantillon a la condition en question
 CONDITION_TO_SAMPLES = {}
 
 for condition in CONDITIONS:
@@ -40,8 +45,8 @@ for path in DIRS:
 	if not os.path.exists(path):
 		os.mkdir(path)
 
-
-rule experimental_design: 		# Création d'un fichier txt qui décrit simplement le design expérimental, ceci est nécessaire pour l'étape d'analyse des gènes différentiellement exprimés sous R
+rule experimental_design: 		# Création d'un fichier txt qui décrit simplement le design expérimental, 
+								# ceci est nécessaire pour l'étape d'analyse des gènes différentiellement exprimés sous DESeq2
 	output:
 		"experimentalDesign.txt"
 
@@ -56,12 +61,16 @@ rule experimental_design: 		# Création d'un fichier txt qui décrit simplement 
 					xpDesign.write(sample+".sorted.bam,"+condition+"\n")
 
 
-
+# Fichier fasta du genome d'arabidopsis 
 genome = config["ref_files"]["genome"]
+# Fichier d'annotation des genes d'arabidopsis
 gtf = config["ref_files"]["gtf"]
+# Description des genes
 description = config["ref_files"]["description"]
+# Transcriptome de reference, pour le pseudo-alignement avec Salmon
 transcriptome = config["ref_files"]["transcriptome"]
 
+# Rename des differents fichiers
 GENOME = "Reference/reference.fasta"
 GTF = "Reference/reference.gtf"
 TRANSCRIPTOME = "Reference/transcriptome.fasta"

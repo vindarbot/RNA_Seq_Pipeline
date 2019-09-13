@@ -25,6 +25,7 @@ if not os.path.exists('logs/2sn_pass'):
 
 ###
 
+# Indexation et alignement des lectures pour la 2eme passe de l'alignement 
 
 rule genome_for_pass2:
 	input:
@@ -101,7 +102,7 @@ else:
 	 		mv pass2/{wildcards.sample}Aligned.sortedByCoord.out.bam {output};'
 
 
-
+# Creation des fichiers qui determine les echantillons associes à chaque condition, necessaire pour rMATS
 rule make_b_files:
 	input:
 		expand("pass2/{sample}.bam", sample=SAMPLES)

@@ -2,6 +2,7 @@
 import os
 configfile: "config.yaml"
 
+# Alignement des echantillons pour l'analyse differentielle a l'echelle des genes.
 
 if not os.path.exists('logs/Mapping'):
 	os.mkdir('logs/Mapping')

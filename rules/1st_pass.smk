@@ -6,10 +6,13 @@ import glob
 
 configfile: "config.yaml"
 
-### 
+# Indexation du genome et premiere passe de l'alignement en 2 etapes pour l'analyse differentielle a l'echelle des isoformes avec rMATS.
+
 
 FILES = [ os.path.basename(x) for x in glob.glob("Experience/*") ] 
 
+# Recupere le nom des echantillons selon si l'experience est en paired-end ou non.
+# Exemple de nom d'echantillon : Col_1
 if config["design"]["paired"]:
 	SAMPLES = list(set([ "_".join(x.split("_")[:2]) for x in FILES]))
 else:
@@ -90,7 +93,7 @@ else:
 
 
 
-
+# Filtrage des  nouvelles jonctions predites supportés par au moins 3 reads
 rule filt_SJ_out:
 	input: 
 		expand("pass1/{sample}SJ.out.tab", sample=SAMPLES)
@@ -104,7 +107,7 @@ rule filt_SJ_out:
 	'''
 
 
-
+# Creation de la bdd des jonctions d'epissage necessaire pour la 2eme passe 
 rule SJ_db:
 	input:
 		"SJ.filt.tab"
