@@ -31,7 +31,9 @@ else:
 
 
 
+
 ###
+
 
 def get_input(wildcards):
 	input_list = ["Reference/reference.fasta"]
@@ -68,7 +70,6 @@ def get_input(wildcards):
 
 	return input_list
 
-
 include: "rules/get_packages.smk"
 include: "rules/get_ref_files.smk"
 
@@ -79,8 +80,6 @@ if config["DEG"]["exec"]:
 	include: "rules/classic_mapping.smk"
 	include: "rules/counts.smk"
 	include: "rules/run_DESeq2.smk"
-
-
 
 if config["DASG"]["exec"]:
 	include: "rules/trimming_AS.smk"
@@ -95,9 +94,9 @@ if config["DTU"]["exec"]:
 
 if config["CSE"]["exec"]:
 	include: "rules/init_CSE.smk"
-	
 
-rule all:	
+
+rule all:
 	input:
 		get_input
 
@@ -112,4 +111,3 @@ for analyse in ["trimming","DEG","DTU","DASG","CSE"]:
 		for param in config[analyse]:
 			print(str(param)+" : "+str(config[analyse][param]))
 
-		

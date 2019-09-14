@@ -41,6 +41,7 @@ else:
 		shell: ''' featureCounts -T {threads} -t exon -g gene_id -a {input.gtf} -o {output} {input.mapping} '''	
 
 rule FPKM: # Regle qui permet de normaliser les valeurs de comptage 
+	input:
 		"featureCounts/counts.txt"
 
 	output:
