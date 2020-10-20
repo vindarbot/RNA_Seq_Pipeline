@@ -3,6 +3,7 @@
 ![alt text](dag.png)
 
 First step : Data cleaning (Optionnal)
+
 Second step : Get references files (reference genome, transcriptome)
 Then:
 1. Differently Alternatively Spliced Genes (DASG)
