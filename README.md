@@ -1,3 +1,14 @@
+## Global workflow of the RNA-Seq Pipeline
+
+![alt text](dag.png)
+
+First step : Data cleaning (Optionnal)
+Then:
+1. Differently Alternatively Spliced Genes (DASG)
+2. Differently Expressed Genes (DEG)
+3. ChromatineStateEnrichment (from DEG list)
+4. Diffential Transcript Utilisation (DTU)
+
 ## Prerequires
 
 If it isn't install, please download Miniconda latest-version here (https://docs.conda.io/en/latest/miniconda.html)
