@@ -9,7 +9,7 @@ Then:
 1. Differently Alternatively Spliced Genes (DASG)
 2. Differently Expressed Genes (DEG)
 3. ChromatineStateEnrichment (from DEG list)
-4. Diffential Transcript Utilisation (DTU)
+4. Diffential Transcrits Usage (DTU)
 
 ## Prerequires
 
