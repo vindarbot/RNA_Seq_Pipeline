@@ -1,4 +1,4 @@
-## Global workflow of the RNA-Seq Pipeline
+## Global workflow 
 
 ![alt text](dag.png)
 
