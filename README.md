@@ -58,7 +58,7 @@ If you don'y want to use one of the step, please put the variable "exec" to "Fal
 If you want to perform CSE analysis, DEG analysis must also be executed.
 
 If you want to only perform CSE analysis, please download the tool individually :
-(https://github.com/Darbinator/ChromatineStateEnrichment)
+(https://github.com/vindarbot/ChromatineStateEnrichment)
 
 ## Files and Folders
 #### - Experience/ 
