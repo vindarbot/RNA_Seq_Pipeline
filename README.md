@@ -16,7 +16,7 @@ Then:
 If it isn't install, please download Miniconda latest-version here (https://docs.conda.io/en/latest/miniconda.html)
 
 After that, download the RNA_Seq_Pipeline project:
-> git clone https://github.com/Darbinator/RNA_Seq_Pipeline.git
+> git clone https://github.com/vindarb/RNA_Seq_Pipeline.git
 
 And go in the repository 
 > cd RNA_Seq_Pipeline 
